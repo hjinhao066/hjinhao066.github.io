@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jinhao Hu — Data Analyst</title>
+<meta name="description" content="Jinhao Hu — data analyst & builder. MSIM at University of Washington. I turn messy operational data into systems people actually use.">
+<meta property="og:title" content="Jinhao Hu — Data Analyst">
+<meta property="og:description" content="I turn messy operational data into pipelines, models, and dashboards that people actually use.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23b8341f'/%3E%3Ctext x='32' y='46' font-family='serif' font-weight='700' font-size='40' fill='%23f9f4ea' text-anchor='middle'%3E%E8%83%A1%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f3ec;
+    --paper-deep: #efeadf;
+    --ink: #211e1a;
+    --ink-soft: #5c554b;
+    --faint: #8d8475;
+    --rule: #d9d2c2;
+    --seal: #b8341f;
+    --seal-deep: #93291a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Fraunces', 'Noto Serif SC', Georgia, serif;
+    font-optical-sizing: auto;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection { background: var(--seal); color: var(--paper); }
+
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-feature-settings: 'tnum';
+  }
+
+  a { color: inherit; text-decoration: none; }
+  .link {
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    transition: text-decoration-color .15s, color .15s;
+  }
+  .link:hover { color: var(--seal); text-decoration-color: var(--seal); }
+
+  /* ---- language switching ---- */
+  html[data-lang="en"] .zh { display: none; }
+  html[data-lang="zh"] .en { display: none; }
+  html[data-lang="zh"] body { font-family: 'Noto Serif SC', 'Fraunces', serif; }
+
+  /* ---- frame ---- */
+  .frame {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ---- top bar ---- */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 26px 0 0;
+    font-size: 12.5px;
+    letter-spacing: .06em;
+    color: var(--faint);
+  }
+  .lang-toggle {
+    background: none;
+    border: none;
+    font: inherit;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: .06em;
+    color: var(--faint);
+    cursor: pointer;
+    padding: 2px 0;
+    border-bottom: 1px solid transparent;
+  }
+  .lang-toggle:hover { color: var(--seal); border-bottom-color: var(--seal); }
+
+  /* ---- masthead ---- */
+  .masthead {
+    padding: 84px 0 56px;
+    border-bottom: 1px solid var(--ink);
+    position: relative;
+  }
+  .masthead h1 {
+    font-size: clamp(52px, 9vw, 104px);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+    max-width: 14ch;
+  }
+  html[data-lang="zh"] .masthead h1 { font-weight: 600; letter-spacing: .04em; }
+
+  .masthead .tagline {
+    margin-top: 30px;
+    font-size: clamp(19px, 2.6vw, 24px);
+    font-weight: 300;
+    max-width: 30em;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .masthead .tagline em {
+    font-style: italic;
+    color: var(--ink);
+  }
+  html[data-lang="zh"] .masthead .tagline em { font-style: normal; border-bottom: 2px solid var(--seal); }
+
+  .seal {
+    position: absolute;
+    right: 0;
+    top: 92px;
+    width: 76px;
+    height: 76px;
+    background: var(--seal);
+    color: #f9f4ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 46px;
+    font-weight: 700;
+    transform: rotate(2.5deg);
+    border-radius: 3px;
+    box-shadow: inset 0 0 14px rgba(60,8,2,.45);
+    user-select: none;
+  }
+  .seal::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1.5px solid rgba(249,244,234,.55);
+    border-radius: 2px;
+  }
+  .seal-cap {
+    position: absolute;
+    right: 0;
+    top: 178px;
+    width: 110px;
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    line-height: 1.6;
+    letter-spacing: .05em;
+    color: var(--faint);
+  }
+
+  .vitals {
+    margin-top: 44px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 36px;
+    font-size: 13px;
+    letter-spacing: .04em;
+    color: var(--ink-soft);
+  }
+  .vitals .dot { color: var(--seal); }
+
+  /* ---- figures strip ---- */
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--rule);
+  }
+  .figure {
+    padding: 38px 28px 34px 0;
+    border-right: 1px solid var(--rule);
+  }
+  .figure:last-child { border-right: none; }
+  .figure + .figure { padding-left: 28px; }
+  .figure .num {
+    font-size: clamp(38px, 5vw, 56px);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-feature-settings: 'tnum';
+  }
+  .figure .num sup {
+    font-size: .45em;
+    font-weight: 400;
+    color: var(--seal);
+    vertical-align: super;
+  }
+  .figure .cap {
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ---- sections ---- */
+  section { padding: 72px 0 24px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    margin-bottom: 48px;
+  }
+  .sec-head .no {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--seal);
+  }
+  .sec-head h2 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+  }
+  html[data-lang="zh"] .sec-head h2 { letter-spacing: .4em; }
+  .sec-head .rule {
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+    transform: translateY(-4px);
+  }
+
+  /* ---- entries (experience / education) ---- */
+  .entry {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr) 200px;
+    gap: 36px;
+    padding: 34px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .entry:first-of-type { border-top: none; padding-top: 0; }
+
+  .entry .when {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--faint);
+    line-height: 1.9;
+    padding-top: 6px;
+  }
+
+  .entry h3 {
+    font-size: 23px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .entry .org {
+    margin-top: 2px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  html[data-lang="zh"] .entry .org { font-style: normal; }
+  .entry .lede {
+    margin-top: 16px;
+    font-size: 16.5px;
+    color: var(--ink);
+  }
+  .entry ul {
+    margin-top: 14px;
+    list-style: none;
+  }
+  .entry li {
+    position: relative;
+    padding-left: 22px;
+    margin-top: 9px;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .entry li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--seal);
+  }
+
+  /* margin note */
+  .note {
+    padding-top: 6px;
+    border-left: 2px solid var(--seal);
+    padding-left: 16px;
+    align-self: start;
+  }
+  .note .note-num {
+    font-size: 34px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    font-feature-settings: 'tnum';
+  }
+  .note .note-num sup { font-size: .5em; color: var(--seal); }
+  .note .note-cap {
+    margin-top: 6px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--faint);
+  }
+
+  /* ---- timeline ---- */
+  .timeline-wrap {
+    padding: 8px 0 40px;
+    overflow-x: auto;
+  }
+  .timeline-wrap svg { min-width: 640px; width: 100%; height: auto; display: block; }
+  .tl-axis { stroke: var(--ink); stroke-width: 1.2; }
+  .tl-tick { stroke: var(--faint); stroke-width: 1; }
+  .tl-year { font-family: 'IBM Plex Mono', monospace; font-size: 11px; fill: var(--faint); }
+  .tl-bar-edu { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+  .tl-bar-uw  { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1 9; }
+  .tl-work { fill: var(--seal); }
+  .tl-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; fill: var(--ink-soft); }
+  .tl-label.red { fill: var(--seal); }
+
+  /* ---- projects ---- */
+  .projects { display: grid; grid-template-columns: 1fr; }
+  .project {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr) 200px;
+    gap: 36px;
+    padding: 34px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .project:first-child { border-top: none; padding-top: 0; }
+  .project .fig-no {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--seal);
+    padding-top: 6px;
+  }
+  .project h3 { font-size: 23px; font-weight: 500; }
+  .project .stack {
+    margin-top: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--faint);
+  }
+  .project p { margin-top: 14px; font-size: 15.5px; color: var(--ink-soft); }
+  .project .plink {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+  }
+
+  /* ---- skills ---- */
+  .skills { border-top: 1px solid var(--rule); }
+  .skill-row {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 36px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .skill-row .k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding-top: 4px;
+  }
+  .skill-row .v { font-size: 16px; }
+  .skill-row .v b { font-weight: 600; }
+
+  /* ---- contact / footer ---- */
+  .outro {
+    margin-top: 64px;
+    border-top: 1px solid var(--ink);
+    padding: 72px 0 40px;
+  }
+  .outro .big {
+    font-size: clamp(30px, 4.6vw, 50px);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    max-width: 22em;
+  }
+  .outro .big a {
+    border-bottom: 2px solid var(--seal);
+    transition: color .15s;
+  }
+  .outro .big a:hover { color: var(--seal); }
+
+  .outro-meta {
+    margin-top: 56px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px 40px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--faint);
+  }
+  .outro-meta .links { display: flex; gap: 28px; }
+
+  .colophon {
+    margin-top: 22px;
+    padding-bottom: 36px;
+    font-size: 11.5px;
+    color: var(--faint);
+    font-style: italic;
+  }
+  html[data-lang="zh"] .colophon { font-style: normal; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 900px) {
+    .entry, .project { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .entry .when, .project .fig-no { padding-top: 0; }
+    .note {
+      margin-top: 18px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding-top: 0;
+    }
+    .note .note-num { font-size: 26px; }
+    .note .note-cap { margin-top: 0; }
+    .skill-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .figures { grid-template-columns: 1fr 1fr; }
+    .figure { border-right: none; border-bottom: 1px solid var(--rule); padding-left: 0 !important; }
+    .figure:nth-child(odd) { border-right: 1px solid var(--rule); padding-right: 24px; }
+    .figure:nth-child(even) { padding-left: 24px !important; }
+    .figure:nth-child(3), .figure:nth-child(4) { border-bottom: none; }
+    .seal { width: 58px; height: 58px; font-size: 34px; top: 76px; }
+    .seal-cap { top: 142px; width: 90px; font-size: 9.5px; }
+  }
+
+  @media print {
+    .topbar { display: none; }
+    body { background: #fff; }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- top bar -->
+  <div class="topbar mono">
+    <span><span class="en">R&Eacute;SUM&Eacute; &middot; JINHAO HU</span><span class="zh">简历 · 胡锦豪</span></span>
+    <span style="display:flex; gap:22px; align-items:baseline;">
+      <a class="lang-toggle" style="text-decoration:none;" href="Jinhao-Hu-Resume.pdf" target="_blank" rel="noopener"><span class="en">DOWNLOAD PDF &darr;</span><span class="zh">下载 PDF &darr;</span></a>
+      <button class="lang-toggle" onclick="toggleLang()"><span class="en">中文版 →</span><span class="zh">ENGLISH →</span></button>
+    </span>
+  </div>
+
+  <!-- masthead -->
+  <header class="masthead">
+    <div class="seal" title="In China, you sign your work with a red name seal. This one reads 'Hu' — my family name.">胡</div>
+    <div class="seal-cap"><span class="en">HU — MY NAME,<br>AS A CHINESE SEAL</span><span class="zh">姓氏印</span></div>
+    <h1><span class="en">Jinhao&nbsp;Hu</span><span class="zh">胡锦豪</span></h1>
+    <p class="tagline">
+      <span class="en">Data analyst &amp; builder. I turn messy operational data into <em>pipelines, models, and dashboards</em> that people actually use.</span>
+      <span class="zh">数据分析师，也是动手做东西的人。我把混乱的业务数据变成<em>真正有人用</em>的管道、模型和看板。</span>
+    </p>
+    <div class="vitals mono">
+      <span><span class="en">SEATTLE, WA</span><span class="zh">美国西雅图</span></span>
+      <span class="dot">●</span>
+      <span><span class="en">MSIM &middot; UNIVERSITY OF WASHINGTON &middot; '27</span><span class="zh">华盛顿大学信息管理硕士 · 2027 届</span></span>
+      <span class="dot">●</span>
+      <span><span class="en">OPEN TO SUMMER 2026 INTERNSHIPS</span><span class="zh">正在寻找 2026 暑期实习</span></span>
+    </div>
+  </header>
+
+  <!-- figures strip -->
+  <div class="figures">
+    <div class="figure">
+      <div class="num">95<sup>%</sup></div>
+      <div class="cap"><span class="en">of manual reporting time eliminated by an automated Python pipeline I built at Yuepu.</span><span class="zh">在悦普搭建自动化 Python 报表管道，砍掉 95% 的人工报表时间。</span></div>
+    </div>
+    <div class="figure">
+      <div class="num">73<sup>%</sup></div>
+      <div class="cap"><span class="en">funnel drop-off uncovered via SQL analysis — it redirected the product roadmap.</span><span class="zh">用 SQL 漏斗分析找出 73% 的流失断点，直接改写了产品优化的优先级。</span></div>
+    </div>
+    <div class="figure">
+      <div class="num">400<sup>K+</sup></div>
+      <div class="cap"><span class="en">bank records cleaned, validated, and modeled for credit-risk scoring.</span><span class="zh">清洗、校验 40 万条银行数据，用于信贷风险评分建模。</span></div>
+    </div>
+    <div class="figure">
+      <div class="num">30<sup>min</sup></div>
+      <div class="cap"><span class="en">polling cycle of the real-time cost-monitoring bot that watched spend for the finance team.</span><span class="zh">实时成本监控机器人的轮询周期，替财务团队盯住每一笔异常支出。</span></div>
+    </div>
+  </div>
+
+  <!-- timeline -->
+  <section id="timeline">
+    <div class="sec-head">
+      <span class="no">01</span>
+      <h2><span class="en">Trajectory</span><span class="zh">轨迹</span></h2>
+      <span class="rule"></span>
+    </div>
+    <div class="timeline-wrap">
+      <svg viewBox="0 0 960 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Career timeline 2021 to 2027">
+        <!-- axis -->
+        <line x1="40" y1="150" x2="920" y2="150" class="tl-axis"/>
+        <!-- year ticks: 2021..2027 mapped 40..880, 140px per year -->
+        <g>
+          <line x1="40"  y1="150" x2="40"  y2="156" class="tl-tick"/><text x="40"  y="174" text-anchor="middle" class="tl-year">2021</text>
+          <line x1="180" y1="150" x2="180" y2="156" class="tl-tick"/><text x="180" y="174" text-anchor="middle" class="tl-year">2022</text>
+          <line x1="320" y1="150" x2="320" y2="156" class="tl-tick"/><text x="320" y="174" text-anchor="middle" class="tl-year">2023</text>
+          <line x1="460" y1="150" x2="460" y2="156" class="tl-tick"/><text x="460" y="174" text-anchor="middle" class="tl-year">2024</text>
+          <line x1="600" y1="150" x2="600" y2="156" class="tl-tick"/><text x="600" y="174" text-anchor="middle" class="tl-year">2025</text>
+          <line x1="740" y1="150" x2="740" y2="156" class="tl-tick"/><text x="740" y="174" text-anchor="middle" class="tl-year">2026</text>
+          <line x1="880" y1="150" x2="880" y2="156" class="tl-tick"/><text x="880" y="174" text-anchor="middle" class="tl-year">2027</text>
+        </g>
+        <!-- education bars -->
+        <line x1="46" y1="118" x2="668" y2="118" class="tl-bar-edu"/>
+        <text x="46" y="103" class="tl-label"><tspan class="en">B.S. INFO MGMT — SWUFE × U. OF DELAWARE (DUAL, GPA 3.89)</tspan><tspan class="zh">本科 · 西南财大 × 特拉华大学双学位（GPA 3.89）</tspan></text>
+        <line x1="682" y1="118" x2="940" y2="118" class="tl-bar-uw"/>
+        <text x="700" y="103" class="tl-label"><tspan class="en">M.S. — UW MSIM</tspan><tspan class="zh">硕士 · 华盛顿大学</tspan></text>
+        <!-- internships: dots above axis -->
+        <circle cx="392" cy="150" r="5" class="tl-work"/>
+        <text x="392" y="38"  text-anchor="middle" class="tl-label red"><tspan class="en">TAILONG BANK '23</tspan><tspan class="zh">泰隆银行 '23</tspan></text>
+        <line x1="392" y1="44" x2="392" y2="143" stroke="#b8341f" stroke-width="1" stroke-dasharray="2 3" opacity=".5"/>
+        <circle cx="467" cy="150" r="5" class="tl-work"/>
+        <text x="467" y="66" text-anchor="middle" class="tl-label red"><tspan class="en">SUANLIYOU '24</tspan><tspan class="zh">算力优 '24</tspan></text>
+        <line x1="467" y1="72" x2="467" y2="143" stroke="#b8341f" stroke-width="1" stroke-dasharray="2 3" opacity=".5"/>
+        <circle cx="650" cy="150" r="5" class="tl-work"/>
+        <text x="650" y="38" text-anchor="middle" class="tl-label red"><tspan class="en">YUEPU (AI DATA) '25</tspan><tspan class="zh">悦普 (AI 数据) '25</tspan></text>
+        <line x1="650" y1="44" x2="650" y2="143" stroke="#b8341f" stroke-width="1" stroke-dasharray="2 3" opacity=".5"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- experience -->
+  <section id="experience">
+    <div class="sec-head">
+      <span class="no">02</span>
+      <h2><span class="en">Experience</span><span class="zh">经历</span></h2>
+      <span class="rule"></span>
+    </div>
+
+    <div class="entry">
+      <div class="when">2025<br>MAY — AUG<br><span class="en">SHANGHAI</span><span class="zh">上海</span></div>
+      <div>
+        <h3><span class="en">AI Data Intern</span><span class="zh">AI 数据实习生</span></h3>
+        <div class="org"><span class="en">Shanghai Yuepu Network Technology</span><span class="zh">上海悦普网络科技</span></div>
+        <p class="lede"><span class="en">Built the automation layer between raw platform data and the people who needed it.</span><span class="zh">在原始平台数据和真正需要它的人之间，搭起一整层自动化。</span></p>
+        <ul>
+          <li><span class="en">Engineered an automated reporting pipeline in Python that pulls API data and generates AI-written summaries — manual reporting time down 95%.</span><span class="zh">用 Python 搭建自动报表管道：拉取 API 数据、生成 AI 文字摘要，人工报表时间下降 95%。</span></li>
+          <li><span class="en">Shipped a real-time cost-monitoring bot (Python + DingTalk API) polling spend every 30 minutes and alerting finance to anomalies instantly.</span><span class="zh">上线实时成本监控机器人（Python + 钉钉 API），每 30 分钟轮询支出，异常即时推送财务团队。</span></li>
+          <li><span class="en">Accelerated data-system development ~20% by drafting technical mockups and data schemas in Axure RP for the engineering team.</span><span class="zh">用 Axure RP 输出技术原型和数据 schema，把业务需求翻译成工程规格，开发提速约 20%。</span></li>
+        </ul>
+      </div>
+      <div class="note">
+        <div class="note-num">95<sup>%</sup></div>
+        <div class="note-cap"><span class="en">less manual reporting. The pipeline ran every day; I didn't have to.</span><span class="zh">报表自动跑，人不用跑。</span></div>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="when">2024<br>JAN — FEB<br><span class="en">SHANGHAI</span><span class="zh">上海</span></div>
+      <div>
+        <h3><span class="en">Data Analyst Intern</span><span class="zh">数据分析实习生</span></h3>
+        <div class="org"><span class="en">Shanghai Suanliyou Technology</span><span class="zh">上海算力优科技</span></div>
+        <p class="lede"><span class="en">Found the leak in the funnel, then built the dashboards so no one had to ask me twice.</span><span class="zh">先找到漏斗里的洞，再做好看板，让所有人自己就能看见数据。</span></p>
+        <ul>
+          <li><span class="en">Ran funnel analysis on user behavior with SQL + Google Analytics, surfacing a 73% drop-off that re-prioritized the product roadmap.</span><span class="zh">用 SQL + Google Analytics 做用户行为漏斗分析，定位 73% 的流失断点，推动产品策略调整。</span></li>
+          <li><span class="en">Designed automated Tableau dashboards tracking DAU and conversion in real time — self-service BI for leadership.</span><span class="zh">设计自动化 Tableau 看板，实时跟踪 DAU 与转化率，管理层实现自助式 BI。</span></li>
+          <li><span class="en">Wrote Playwright regression scripts to guard core product flows and data integrity.</span><span class="zh">用 Playwright 编写自动化回归测试脚本，守住核心功能与数据完整性。</span></li>
+        </ul>
+      </div>
+      <div class="note">
+        <div class="note-num">73<sup>%</sup></div>
+        <div class="note-cap"><span class="en">drop-off point. One query changed what the team built next.</span><span class="zh">一条查询，改变了团队接下来做什么。</span></div>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="when">2023<br>JUL — AUG<br><span class="en">HANGZHOU</span><span class="zh">杭州</span></div>
+      <div>
+        <h3><span class="en">Data Analyst Intern</span><span class="zh">数据分析实习生</span></h3>
+        <div class="org"><span class="en">Zhejiang Tailong Commercial Bank</span><span class="zh">浙江泰隆商业银行</span></div>
+        <p class="lede"><span class="en">Risk modeling at bank scale: clean first, model second, report to the people who decide.</span><span class="zh">银行尺度的风险建模：先把数据洗干净，再建模，最后讲给做决策的人听。</span></p>
+        <ul>
+          <li><span class="en">Cleaned and validated 400K+ records in SQL to support credit-risk modeling.</span><span class="zh">用 SQL 清洗校验 40 万余条记录，为信贷风险建模打底。</span></li>
+          <li><span class="en">Built a score-based risk model with Python (Pandas, scikit-learn) — feature engineering through logistic regression.</span><span class="zh">用 Python（Pandas、scikit-learn）构建评分制风险模型，从特征工程做到逻辑回归。</span></li>
+          <li><span class="en">Synthesized AI-adoption intelligence across 10 banks into a report naming three integration opportunities for senior leadership.</span><span class="zh">梳理 10 家银行的 AI 落地情报，向管理层提交报告并点出三个高价值切入点。</span></li>
+        </ul>
+      </div>
+      <div class="note">
+        <div class="note-num">400<sup>K+</sup></div>
+        <div class="note-cap"><span class="en">records. Real model, real consequences.</span><span class="zh">真实数据，真实后果。</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- projects -->
+  <section id="projects">
+    <div class="sec-head">
+      <span class="no">03</span>
+      <h2><span class="en">Selected Work</span><span class="zh">作品选</span></h2>
+      <span class="rule"></span>
+    </div>
+
+    <div class="projects">
+      <div class="project">
+        <div class="fig-no">FIG. 1</div>
+        <div>
+          <h3>idlebell</h3>
+          <div class="stack">SHELL · LAUNCHD / WINDOWS · OPEN SOURCE</div>
+          <p><span class="en">A tiny daemon that rings when your AI coding agents go idle — so you stop babysitting terminals. Built for my own multi-agent workflow, then packaged for macOS and Windows and put on GitHub.</span><span class="zh">一个小守护进程：AI 编程 agent 一闲下来就提醒你，从此不用盯终端。先是给自己的多 agent 工作流做的，后来打包成 macOS + Windows 开源发布。</span></p>
+          <a class="plink link" href="https://github.com/hjinhao066/idlebell" target="_blank" rel="noopener">github.com/hjinhao066/idlebell ↗</a>
+        </div>
+        <div class="note">
+          <div class="note-cap"><span class="en">Born from a real itch: six agents, one pair of eyes.</span><span class="zh">真实痛点：六个 agent，一双眼睛。</span></div>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="fig-no">FIG. 2</div>
+        <div>
+          <h3><span class="en">Campus Delivery Service</span><span class="zh">校园配送平台</span></h3>
+          <div class="stack">FLASK · MYSQL · DOCKER · FUSIONCHARTS</div>
+          <p><span class="en">Full-stack MVP handling real-time orders and status tracking, with an ops dashboard for order volume and monthly trends. Dockerized to a one-command deploy.</span><span class="zh">全栈 MVP：实时下单与状态追踪，外加订单量和月度趋势的运营看板。Docker 化之后，一条命令完成部署。</span></p>
+        </div>
+        <div class="note">
+          <div class="note-cap"><span class="en">From schema to ship, solo.</span><span class="zh">从数据库设计到上线，独立完成。</span></div>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="fig-no">FIG. 3</div>
+        <div>
+          <h3><span class="en">Age, Nation &amp; the Nobel Prize</span><span class="zh">年龄、国别与诺贝尔奖</span></h3>
+          <div class="stack">PANDAS · EDA · STREAMLIT</div>
+          <p><span class="en">Cleaned 900+ historical laureate records to 98% dataset accuracy, ran the EDA, and shipped the findings as an interactive Streamlit app instead of a static slide deck.</span><span class="zh">把 900 多条诺奖历史数据清洗到 98% 准确率，做完探索性分析后，没有交一份静态 PPT，而是发布成可交互的 Streamlit 应用。</span></p>
+        </div>
+        <div class="note">
+          <div class="note-cap"><span class="en">Analysis people can poke at beats analysis people scroll past.</span><span class="zh">能上手玩的分析，胜过被划过去的分析。</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- skills -->
+  <section id="skills">
+    <div class="sec-head">
+      <span class="no">04</span>
+      <h2><span class="en">Toolbox</span><span class="zh">工具箱</span></h2>
+      <span class="rule"></span>
+    </div>
+    <div class="skills">
+      <div class="skill-row">
+        <div class="k"><span class="en">Languages</span><span class="zh">语言</span></div>
+        <div class="v"><b>Python</b> (Pandas, NumPy, scikit-learn) · <b>SQL</b> · R · JavaScript</div>
+      </div>
+      <div class="skill-row">
+        <div class="k"><span class="en">Data &amp; Cloud</span><span class="zh">数据与云</span></div>
+        <div class="v">Snowflake · Airflow · dbt · <span class="en">ETL &amp; warehousing</span><span class="zh">ETL 与数仓</span> · AWS · Docker · Git</div>
+      </div>
+      <div class="skill-row">
+        <div class="k"><span class="en">Analytics</span><span class="zh">分析</span></div>
+        <div class="v">Tableau · Power BI · Google Analytics · Excel · <span class="en">A/B testing</span><span class="zh">A/B 测试</span></div>
+      </div>
+      <div class="skill-row">
+        <div class="k"><span class="en">Practice</span><span class="zh">方法</span></div>
+        <div class="v"><span class="en">KPI &amp; metric design · workflow optimization · data storytelling</span><span class="zh">KPI 与指标设计 · 工作流优化 · 数据叙事</span></div>
+      </div>
+      <div class="skill-row">
+        <div class="k"><span class="en">Teaching</span><span class="zh">教学</span></div>
+        <div class="v"><span class="en">TA, Database Management (MISY330) — mentored 50+ students in advanced SQL</span><span class="zh">《数据库管理》助教（MISY330）— 带 50+ 名学生进阶 SQL</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- contact -->
+  <footer class="outro" id="contact">
+    <p class="big">
+      <span class="en">Looking for a Summer 2026 data or product intern who ships? <a href="mailto:hjinhao066@gmail.com">Write to me.</a></span>
+      <span class="zh">在找一个能真正交付的 2026 暑期数据 / 产品实习生？<a href="mailto:hjinhao066@gmail.com">给我写邮件。</a></span>
+    </p>
+    <div class="outro-meta">
+      <div class="links">
+        <a class="link" href="mailto:hjinhao066@gmail.com">EMAIL</a>
+        <a class="link" href="https://www.linkedin.com/in/jinhao-hu-uw" target="_blank" rel="noopener">LINKEDIN</a>
+        <a class="link" href="https://github.com/hjinhao066" target="_blank" rel="noopener">GITHUB</a>
+      </div>
+      <span>SEATTLE 47.6°N, 122.3°W</span>
+    </div>
+    <p class="colophon"><span class="en">Set in Fraunces &amp; IBM Plex Mono. No frameworks, no tracking — one HTML file.</span><span class="zh">排版：Fraunces 与 IBM Plex Mono。无框架，无追踪 —— 一个 HTML 文件。</span></p>
+  </footer>
+
+</div>
+
+<script>
+  const saved = localStorage.getItem('lang');
+  document.documentElement.dataset.lang = saved === 'zh' ? 'zh' : 'en';
+  function toggleLang() {
+    const next = document.documentElement.dataset.lang === 'en' ? 'zh' : 'en';
+    document.documentElement.dataset.lang = next;
+    document.documentElement.lang = next === 'zh' ? 'zh-CN' : 'en';
+    localStorage.setItem('lang', next);
+  }
+</script>
+</body>
+</html>

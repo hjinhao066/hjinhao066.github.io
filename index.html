@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jinhao Hu — 胡锦豪</title>
+<meta name="description" content="The personal site of Jinhao Hu (胡锦豪) — data analyst, AI-agent tinkerer, and someone who keeps going outside to collect light.">
+<meta property="og:title" content="Jinhao Hu — 胡锦豪">
+<meta property="og:description" content="Data analyst by training, builder by instinct. Field notes, things I build, and a red seal that opens doors.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23c5402a'/%3E%3Ctext x='32' y='47' font-family='serif' font-weight='700' font-size='40' fill='%23f4ecda' text-anchor='middle'%3E%E8%83%A1%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.className = 'js';</script>
+<style>
+  :root {
+    --ink: #14110c;
+    --ink-2: #1b1711;
+    --ink-3: #221d15;
+    --ivory: #efe7d5;
+    --dim: #a89e89;
+    --faint: #756b59;
+    --line: #2d2618;
+    --seal: #c5402a;
+    --seal-deep: #9b2f1f;
+    --gold: #c8a45c;
+    --maxw: 1280px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html.js .reveal { opacity: 0; }
+  html.still .reveal { opacity: 1 !important; transform: none !important; }
+  html.still .hero { min-height: 0 !important; padding: 130px 0 70px !important; }
+  html.still .scrollcue { display: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .reveal { opacity: 1; }
+  }
+
+  body {
+    font-family: 'Fraunces', 'Noto Serif SC', Georgia, serif;
+    font-optical-sizing: auto;
+    background: var(--ink);
+    color: var(--ivory);
+    line-height: 1.6;
+    font-size: 18px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  body.menu-open { overflow: hidden; }
+
+  ::selection { background: var(--seal); color: var(--ivory); }
+
+  a { color: inherit; text-decoration: none; }
+  .u {
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1px;
+    transition: color .2s, text-decoration-color .2s;
+  }
+  .u:hover { color: var(--seal); text-decoration-color: var(--seal); }
+
+  .cn { font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif; }
+  .label {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .28em;
+    font-size: 11.5px;
+    color: var(--faint);
+  }
+
+  html[data-lang="en"] .zh { display: none; }
+  html[data-lang="zh"] .en { display: none; }
+  html[data-lang="zh"] body { font-family: 'Noto Serif SC', 'Fraunces', serif; }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 40px; }
+
+  /* ---------------- grain + vignette overlay ---------------- */
+  .grain {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    opacity: .04; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .vignette {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 30%, transparent 55%, rgba(0,0,0,.45) 100%);
+  }
+
+  /* ---------------- top bar ---------------- */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 40px;
+    mix-blend-mode: difference;
+  }
+  .topbar .brand { font-weight: 500; font-size: 15px; letter-spacing: .02em; color: #fff; }
+  .topbar .right { display: flex; gap: 26px; align-items: center; }
+  .topbar a, .topbar button {
+    color: #fff; background: none; border: none; cursor: pointer;
+    font-family: 'Fraunces', serif; font-size: 13px; letter-spacing: .04em;
+    padding: 0; opacity: .85; transition: opacity .2s;
+  }
+  .topbar a:hover, .topbar button:hover { opacity: 1; }
+
+  /* ---------------- hero ---------------- */
+  .hero {
+    position: relative; z-index: 2;
+    min-height: 100svh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 0 80px;
+  }
+  .hero .eyebrow { margin-bottom: 30px; }
+  .hero-name {
+    display: flex; align-items: flex-start; gap: 28px; flex-wrap: wrap;
+  }
+  .hero-cn {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: clamp(72px, 16vw, 210px);
+    line-height: .86;
+    color: var(--ivory);
+    letter-spacing: .04em;
+  }
+  .hero-en {
+    font-size: clamp(20px, 2.4vw, 30px);
+    font-weight: 300;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding-top: 14px;
+  }
+  .hero-tagline {
+    margin-top: 44px;
+    font-size: clamp(22px, 3vw, 40px);
+    font-weight: 300;
+    line-height: 1.32;
+    max-width: 20ch;
+    letter-spacing: -0.01em;
+  }
+  .hero-tagline em { font-style: italic; color: var(--gold); }
+  html[data-lang="zh"] .hero-tagline { max-width: 24ch; }
+  html[data-lang="zh"] .hero-tagline em { font-style: normal; color: var(--gold); }
+
+  .scrollcue {
+    position: absolute; bottom: 34px; left: 0;
+    display: flex; align-items: center; gap: 14px;
+    color: var(--faint); font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
+  }
+  .scrollcue .bar { width: 46px; height: 1px; background: var(--faint); position: relative; overflow: hidden; }
+  .scrollcue .bar::after { content:''; position:absolute; inset:0; width:40%; background: var(--seal); animation: slide 2.4s ease-in-out infinite; }
+  @keyframes slide { 0%{transform:translateX(-120%)} 60%,100%{transform:translateX(280%)} }
+
+  /* ---------------- generic section ---------------- */
+  section { position: relative; z-index: 2; }
+  .sec-pad { padding: 120px 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 20px; margin-bottom: 56px; }
+  .sec-head .idx { font-family: 'Ma Shan Zheng', serif; font-size: 30px; color: var(--seal); line-height: 1; }
+  .sec-head h2 {
+    font-size: clamp(30px, 4.4vw, 56px); font-weight: 400; letter-spacing: -0.02em;
+  }
+  .sec-head h2 em { font-style: italic; color: var(--dim); }
+  .sec-head .rule { flex: 1; height: 1px; background: var(--line); transform: translateY(-8px); }
+
+  /* about */
+  .about-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 64px; align-items: start; }
+  .about-lede { font-size: clamp(21px, 2.5vw, 30px); font-weight: 300; line-height: 1.5; }
+  .about-lede em { font-style: italic; color: var(--gold); }
+  html[data-lang="zh"] .about-lede em { font-style: normal; color: var(--gold); }
+  .about-body { margin-top: 26px; font-size: 17px; color: var(--dim); line-height: 1.7; max-width: 46ch; }
+  .vcard { border: 1px solid var(--line); }
+  .vcard .row { display: flex; justify-content: space-between; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .vcard .row:last-child { border-bottom: none; }
+  .vcard .k { color: var(--faint); letter-spacing: .04em; }
+  .vcard .v { color: var(--ivory); text-align: right; }
+
+  /* building */
+  .builds { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .build { background: var(--ink); padding: 36px 34px; transition: background .3s; position: relative; }
+  .build:hover { background: var(--ink-2); }
+  .build .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .build h3 { font-size: 26px; font-weight: 500; letter-spacing: -0.01em; }
+  .build .tag { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--seal); }
+  .build .tag.live { color: var(--gold); }
+  .build p { margin-top: 14px; font-size: 15.5px; color: var(--dim); line-height: 1.6; }
+  .build .stack { margin-top: 18px; font-size: 12px; letter-spacing: .08em; color: var(--faint); }
+  .build .go { margin-top: 18px; display: inline-block; font-size: 13px; color: var(--ivory); border-bottom: 1px solid var(--seal); padding-bottom: 2px; }
+  .build .go:hover { color: var(--seal); }
+
+  /* ---------------- field notes / gallery ---------------- */
+  .gallery { display: flex; flex-direction: column; gap: 150px; margin-top: 30px; }
+  .shot { position: relative; }
+  .shot .imgwrap { overflow: hidden; position: relative; background: var(--ink-2); }
+  .shot .imgwrap::after { content:''; position:absolute; inset:0; box-shadow: inset 0 0 0 0 var(--seal); transition: box-shadow .4s ease; pointer-events:none; }
+  .shot .imgwrap:hover::after { box-shadow: inset 0 0 0 2px var(--seal); }
+  .shot img { width: 100%; height: 100%; object-fit: cover; display: block; will-change: transform; transition: filter .5s ease; }
+  .shot .imgwrap:hover img { filter: brightness(1.06) saturate(1.04); }
+  html.js .shot .imgwrap { clip-path: inset(0 0 0 0); }
+  .shot figcaption {
+    margin-top: 16px; display: flex; justify-content: space-between; align-items: baseline; gap: 20px;
+  }
+  .shot .cap-cn { font-family: 'Ma Shan Zheng', serif; font-size: 30px; color: var(--ivory); line-height: 1; }
+  .shot .cap-meta { text-align: right; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .shot .cap-meta .no { color: var(--seal); }
+
+  /* layout variants */
+  .shot.wide { width: 100%; }
+  .shot.wide .imgwrap { aspect-ratio: 16/9; }
+  .shot.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; }
+  .shot.pair .col .imgwrap { aspect-ratio: 4/5; }
+  .shot.off { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+  .shot.off.right { direction: rtl; }
+  .shot.off.right > * { direction: ltr; }
+  .shot.off .imgwrap { aspect-ratio: 4/5; }
+  .shot.off .side { padding: 0 10px; }
+  .shot.off .side .big { font-family: 'Ma Shan Zheng', serif; font-size: clamp(40px, 6vw, 96px); line-height: .9; color: var(--ivory); }
+  .shot.off .side .txt { margin-top: 18px; font-size: 16px; color: var(--dim); font-style: italic; line-height: 1.6; max-width: 30ch; }
+  html[data-lang="zh"] .shot.off .side .txt { font-style: normal; }
+  .shot.off .side .meta { margin-top: 22px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .shot.tall .imgwrap { aspect-ratio: 3/4; max-width: 62%; }
+
+  .interlude { text-align: center; padding: 40px 0; }
+  .interlude .q { font-size: clamp(24px, 3.4vw, 44px); font-weight: 300; font-style: italic; line-height: 1.4; max-width: 18ch; margin: 0 auto; color: var(--dim); }
+  html[data-lang="zh"] .interlude .q { font-style: normal; }
+  .interlude .q .mark { color: var(--seal); font-style: normal; }
+
+  /* ---------------- résumé callout ---------------- */
+  .resume-cta { position: relative; z-index: 2; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 110px 0; text-align: center; }
+  .resume-cta .small { margin-bottom: 22px; }
+  .resume-cta h2 { font-size: clamp(30px, 5vw, 64px); font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; max-width: 18ch; margin: 0 auto 36px; }
+  .resume-cta h2 em { font-style: italic; color: var(--gold); }
+  html[data-lang="zh"] .resume-cta h2 em { font-style: normal; color: var(--gold); }
+  .btn-seal {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 16px 30px; border: 1px solid var(--seal); color: var(--ivory);
+    font-size: 15px; letter-spacing: .04em; border-radius: 2px;
+    transition: background .25s, color .25s; background: transparent;
+  }
+  .btn-seal:hover { background: var(--seal); color: #fff; }
+  .btn-seal .arr { transition: transform .25s; }
+  .btn-seal:hover .arr { transform: translateX(5px); }
+
+  /* ---------------- footer ---------------- */
+  footer { position: relative; z-index: 2; padding: 90px 0 50px; }
+  .foot-top { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 30px; }
+  .foot-top .big { font-size: clamp(28px, 4vw, 48px); font-weight: 300; line-height: 1.3; max-width: 16ch; }
+  .foot-top .big a { border-bottom: 2px solid var(--seal); }
+  .foot-top .big a:hover { color: var(--seal); }
+  .foot-links { display: flex; gap: 28px; }
+  .foot-links a { font-size: 14px; letter-spacing: .08em; }
+  .foot-meta { margin-top: 50px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; color: var(--faint); font-size: 12px; letter-spacing: .06em; }
+  .foot-meta .colophon { font-style: italic; }
+  html[data-lang="zh"] .foot-meta .colophon { font-style: normal; }
+
+  /* ---------------- interactive seal ---------------- */
+  .seal-dock { position: fixed; right: 34px; bottom: 34px; z-index: 50; width: 86px; height: 86px; }
+  .seal-btn {
+    position: absolute; inset: 0; z-index: 3;
+    background: var(--seal); color: #f4ecda; border: none; cursor: pointer;
+    font-family: 'Ma Shan Zheng', serif; font-size: 50px; line-height: 1;
+    border-radius: 5px; box-shadow: inset 0 0 18px rgba(40,5,0,.5), 0 10px 30px rgba(0,0,0,.5);
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .seal-btn::after { content:''; position:absolute; inset:5px; border:1.5px solid rgba(244,236,218,.5); border-radius:3px; }
+  .seal-btn:hover { transform: scale(1.06) rotate(-3deg); }
+  .seal-btn.stamp { animation: stamp .5s ease; }
+  @keyframes stamp { 0%{transform:scale(1)} 22%{transform:scale(.8) rotate(4deg)} 50%{transform:scale(1.12) rotate(-2deg)} 100%{transform:scale(1)} }
+  .seal-hint { position: absolute; right: 102px; bottom: 30px; white-space: nowrap; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); opacity: 1; transition: opacity .3s; pointer-events: none; }
+  .seal-dock.open .seal-hint { opacity: 0; }
+
+  /* radial menu items */
+  .seal-menu { position: absolute; inset: 0; pointer-events: none; }
+  .seal-item {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%,-50%) scale(.4);
+    opacity: 0; pointer-events: none;
+    width: 62px; height: 62px; border-radius: 50%;
+    background: var(--ink-2); border: 1px solid var(--line); color: var(--ivory);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; letter-spacing: .04em; text-align: center;
+    transition: transform .4s cubic-bezier(.34,1.4,.5,1), opacity .3s, background .2s, border-color .2s;
+  }
+  .seal-item .cn { font-size: 19px; }
+  .seal-dock.open .seal-item { opacity: 1; pointer-events: auto; }
+  .seal-item:hover { background: var(--seal); border-color: var(--seal); color: #fff; }
+  /* fan-out positions (up-left quarter) set per item */
+  .seal-dock.open .seal-item.i1 { transform: translate(-50%,-50%) translate(2px,-116px) scale(1); }
+  .seal-dock.open .seal-item.i2 { transform: translate(-50%,-50%) translate(-46px,-106px) scale(1); }
+  .seal-dock.open .seal-item.i3 { transform: translate(-50%,-50%) translate(-84px,-84px) scale(1); }
+  .seal-dock.open .seal-item.i4 { transform: translate(-50%,-50%) translate(-106px,-46px) scale(1); }
+  .seal-dock.open .seal-item.i5 { transform: translate(-50%,-50%) translate(-116px,2px) scale(1); }
+
+  /* ink splash on stamp */
+  .ink-splash { position: fixed; z-index: 49; width: 10px; height: 10px; border-radius: 50%; background: var(--seal); pointer-events: none; transform: translate(-50%,-50%); opacity: .85; }
+  .ink-splash.go { animation: splash .6s ease-out forwards; }
+  @keyframes splash { to { width: 240px; height: 240px; opacity: 0; } }
+
+  /* ---------------- responsive ---------------- */
+  @media (max-width: 900px) {
+    body { font-size: 17px; }
+    .wrap { padding: 0 24px; }
+    .topbar { padding: 18px 24px; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .builds { grid-template-columns: 1fr; }
+    .shot.pair, .shot.off { grid-template-columns: 1fr; gap: 24px; }
+    .shot.off.right { direction: ltr; }
+    .shot.off .side { order: 2; }
+    .shot.tall .imgwrap { max-width: 100%; }
+    .gallery { gap: 90px; }
+    .sec-pad { padding: 84px 0; }
+    .seal-dock { right: 20px; bottom: 20px; width: 66px; height: 66px; }
+    .seal-btn { font-size: 38px; }
+    .seal-hint { display: none; }
+    .seal-dock.open .seal-item.i1 { transform: translate(-50%,-50%) translate(2px,-96px) scale(1); }
+    .seal-dock.open .seal-item.i2 { transform: translate(-50%,-50%) translate(-38px,-88px) scale(1); }
+    .seal-dock.open .seal-item.i3 { transform: translate(-50%,-50%) translate(-70px,-70px) scale(1); }
+    .seal-dock.open .seal-item.i4 { transform: translate(-50%,-50%) translate(-88px,-38px) scale(1); }
+    .seal-dock.open .seal-item.i5 { transform: translate(-50%,-50%) translate(-96px,2px) scale(1); }
+  }
+  @media (max-width: 600px) {
+    .topbar .right a[href="#building"], .topbar .right a[href="#field"] { display: none; }
+    .hero-name { gap: 6px; }
+    .hero-en { flex-basis: 100%; padding-top: 4px; }
+    .hero-tagline { max-width: 26ch; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<!-- top bar -->
+<div class="topbar">
+  <a class="brand" href="#top"><span class="en">Jinhao Hu</span><span class="zh">胡锦豪</span></a>
+  <div class="right">
+    <a href="#building"><span class="en">Work</span><span class="zh">在做</span></a>
+    <a href="#field"><span class="en">Field Notes</span><span class="zh">行迹</span></a>
+    <a href="resume/"><span class="en">Résumé</span><span class="zh">简历</span></a>
+    <button onclick="toggleLang()"><span class="en">中文</span><span class="zh">EN</span></button>
+  </div>
+</div>
+
+<main id="top">
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow label reveal" data-rise><span class="en">Personal Site · Seattle</span><span class="zh">个人站 · 西雅图</span></div>
+    <div class="hero-name">
+      <span class="hero-cn reveal" data-rise>胡锦豪</span>
+      <span class="hero-en reveal" data-rise>Jinhao&nbsp;Hu</span>
+    </div>
+    <h1 class="hero-tagline reveal" data-rise>
+      <span class="en">Data analyst by training. Builder by instinct. I teach machines the boring parts, then go outside to <em>collect light</em>.</span>
+      <span class="zh">科班出身的数据分析师，骨子里更爱造东西。我把无聊的活儿教给机器，然后出门<em>收集光</em>。</span>
+    </h1>
+    <div class="scrollcue">
+      <span class="bar"></span>
+      <span><span class="en">Scroll</span><span class="zh">向下</span></span>
+    </div>
+  </header>
+
+  <!-- ABOUT -->
+  <section id="about" class="sec-pad">
+    <div class="sec-head reveal" data-rise>
+      <span class="idx cn">一</span>
+      <h2><span class="en">Who's <em>writing</em></span><span class="zh">这是<em>谁</em></span></h2>
+      <span class="rule"></span>
+    </div>
+    <div class="about-grid">
+      <div class="reveal" data-rise>
+        <p class="about-lede">
+          <span class="en">I'm Jinhao — from Zhejiang, China, now a graduate student in Information Management at the <em>University of Washington</em>, Seattle.</span>
+          <span class="zh">我是锦豪，浙江人，现在在<em>华盛顿大学</em>读信息管理硕士，人在西雅图。</span>
+        </p>
+        <p class="about-body">
+          <span class="en">By day I live in SQL, Python, and dashboards — turning messy operational data into things teams can act on. The rest of the time I'm building small tools to automate my own life, getting a little too obsessed with AI agents, and chasing good light with a camera. This site is the human half. The work half lives on my résumé.</span>
+          <span class="zh">白天我泡在 SQL、Python 和各种看板里，把杂乱的业务数据变成团队真正能用的东西。其余时间，我在写一些自动化自己生活的小工具，对 AI agent 有点上头，再背着相机去追光。这个站是「人」的那一半，「工作」的那一半放在简历里。</span>
+        </p>
+      </div>
+      <div class="vcard reveal" data-rise>
+        <div class="row"><span class="k"><span class="en">Based</span><span class="zh">现居</span></span><span class="v"><span class="en">Seattle, WA</span><span class="zh">西雅图</span></span></div>
+        <div class="row"><span class="k"><span class="en">From</span><span class="zh">来自</span></span><span class="v"><span class="en">Zhejiang, China</span><span class="zh">中国浙江</span></span></div>
+        <div class="row"><span class="k"><span class="en">Studying</span><span class="zh">在读</span></span><span class="v">MSIM · UW '27</span></div>
+        <div class="row"><span class="k"><span class="en">Working on</span><span class="zh">方向</span></span><span class="v"><span class="en">Data · BI · AI automation</span><span class="zh">数据 · BI · AI 自动化</span></span></div>
+        <div class="row"><span class="k"><span class="en">Status</span><span class="zh">状态</span></span><span class="v" style="color:var(--gold)"><span class="en">Open to summer '26</span><span class="zh">找 2026 暑期实习</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILDING -->
+  <section id="building" class="sec-pad">
+    <div class="sec-head reveal" data-rise>
+      <span class="idx cn">二</span>
+      <h2><span class="en">Things I <em>build</em></span><span class="zh">在<em>造</em>的东西</span></h2>
+      <span class="rule"></span>
+    </div>
+    <p class="about-lede reveal" data-rise style="max-width:34ch; margin-bottom:48px;">
+      <span class="en">I'm a little obsessed with AI agents. I build tools for an audience of one — me — and open-source the ones that survive.</span>
+      <span class="zh">我对 AI agent 有点着迷。我做的工具往往只有一个用户——我自己——其中活下来的，就开源出去。</span>
+    </p>
+    <div class="builds reveal" data-rise>
+      <div class="build">
+        <div class="top">
+          <h3>idlebell</h3>
+          <span class="tag live"><span class="en">Open Source</span><span class="zh">开源</span></span>
+        </div>
+        <p><span class="en">A tiny daemon that rings when your AI coding agents go idle — so you can run a fleet of them without babysitting terminals.</span><span class="zh">一个小守护进程：当你的 AI 编程 agent 闲下来时响铃，于是你能同时跑一群 agent，而不用一直盯着终端。</span></p>
+        <div class="stack">macOS · Windows · Shell · launchd</div>
+        <a class="go" href="https://github.com/hjinhao066/idlebell" target="_blank" rel="noopener">github.com/hjinhao066/idlebell ↗</a>
+      </div>
+      <div class="build">
+        <div class="top">
+          <h3>Hermes</h3>
+          <span class="tag"><span class="en">Personal</span><span class="zh">自用</span></span>
+        </div>
+        <p><span class="en">My private "life OS" — a 24/7 hub that reads my feeds, files my newsletters, and ships me a morning briefing before I'm awake.</span><span class="zh">我的私人「生活操作系统」——一个 7×24 的中枢，替我读资讯、归类邮件，在我醒来前把当天的晨报送到。</span></p>
+        <div class="stack">RSS · Agents · Telegram · Cron</div>
+      </div>
+      <div class="build">
+        <div class="top">
+          <h3>AgentDeck</h3>
+          <span class="tag"><span class="en">Personal</span><span class="zh">自用</span></span>
+        </div>
+        <p><span class="en">A TweetDeck-style command center for terminals — many AI agents, side by side in columns, each its own live shell.</span><span class="zh">一个 TweetDeck 风格的终端指挥台——多个 AI agent 并排成列，每一列都是独立的实时 shell。</span></p>
+        <div class="stack">Electron · xterm.js · node-pty</div>
+      </div>
+      <div class="build">
+        <div class="top">
+          <h3><span class="en">The Data Stack</span><span class="zh">数据栈</span></h3>
+          <span class="tag"><span class="en">Craft</span><span class="zh">本行</span></span>
+        </div>
+        <p><span class="en">The day job, sharpened: automated reporting pipelines, real-time monitoring bots, and dashboards that answer questions before they're asked.</span><span class="zh">把本行打磨锋利：自动化报表管道、实时监控机器人，以及在问题被提出前就给出答案的看板。</span></p>
+        <div class="stack">Python · SQL · Snowflake · Tableau · dbt</div>
+        <a class="go" href="resume/"><span class="en">See the résumé →</span><span class="zh">看简历 →</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIELD NOTES -->
+  <section id="field" class="sec-pad">
+    <div class="sec-head reveal" data-rise>
+      <span class="idx cn">三</span>
+      <h2><span class="en">Field Notes</span><span class="zh">行迹</span></h2>
+      <span class="rule"></span>
+    </div>
+    <p class="about-lede reveal" data-rise style="max-width:30ch; margin-bottom:10px;">
+      <span class="en">Trailheads, harbors, deserts, night skies. The frames I keep coming back to.</span>
+      <span class="zh">山径、海港、沙漠、夜空。那些我总会回头看的画面。</span>
+    </p>
+
+    <div class="gallery">
+
+      <figure class="shot wide reveal" data-rise>
+        <div class="imgwrap"><img src="img/joffre-arms.jpg" alt="Arms wide on a log over a turquoise glacier lake" data-par></div>
+        <figcaption><span class="cap-cn">乔佛里</span><span class="cap-meta"><span class="no">№ 01</span> · <span class="en">JOFFRE LAKES, BC · AUG 2024</span><span class="zh">乔佛里湖，BC · 2024.08</span></span></figcaption>
+      </figure>
+
+      <div class="shot pair reveal" data-rise>
+        <div class="col"><figure><div class="imgwrap"><img src="img/joffre-profile.jpg" alt="Profile against a turquoise lake" data-par></div><figcaption><span class="cap-cn">湖</span><span class="cap-meta"><span class="no">№ 02</span> · JOFFRE LAKES</span></figcaption></figure></div>
+        <div class="col"><figure><div class="imgwrap"><img src="img/smith-rock.jpg" alt="Sitting on a cliff edge at Smith Rock" data-par></div><figcaption><span class="cap-cn">崖</span><span class="cap-meta"><span class="no">№ 03</span> · SMITH ROCK, OR</span></figcaption></figure></div>
+      </div>
+
+      <figure class="shot off right reveal" data-rise>
+        <div class="imgwrap"><img src="img/franklin-falls.jpg" alt="Arms open before a frozen waterfall" data-par></div>
+        <div class="side">
+          <div class="big cn">冰瀑</div>
+          <div class="txt"><span class="en">A waterfall caught mid-freeze. Stand close enough and the cold has a sound.</span><span class="zh">一条被冻在半空的瀑布。站得够近，连寒冷都有声音。</span></div>
+          <div class="meta"><span class="no" style="color:var(--seal)">№ 04</span> · <span class="en">FRANKLIN FALLS, WA · FEB 2026</span><span class="zh">富兰克林瀑布 · 2026.02</span></div>
+        </div>
+      </figure>
+
+      <div class="interlude reveal" data-rise>
+        <p class="q"><span class="mark">「</span><span class="en">The best datasets and the best views share one thing: you have to hike to them.</span><span class="zh">最好的数据和最好的风景有个共同点——都得自己走过去。</span><span class="mark">」</span></p>
+      </div>
+
+      <figure class="shot off reveal" data-rise>
+        <div class="imgwrap"><img src="img/erhai-profile.jpg" alt="Sitting by Erhai Lake, looking out" data-par></div>
+        <div class="side">
+          <div class="big cn">洱海</div>
+          <div class="txt"><span class="en">Dali, where the lake is so wide it borrows the whole sky.</span><span class="zh">大理。湖面宽到把整片天空都借了过来。</span></div>
+          <div class="meta"><span class="no" style="color:var(--seal)">№ 05</span> · <span class="en">ERHAI LAKE, DALI · JUN 2023</span><span class="zh">洱海，大理 · 2023.06</span></div>
+        </div>
+      </figure>
+
+      <div class="shot pair reveal" data-rise>
+        <div class="col"><figure><div class="imgwrap"><img src="img/dali-cangshan.jpg" alt="Farmland under the Cangshan range, Dali" data-par></div><figcaption><span class="cap-cn">苍山</span><span class="cap-meta"><span class="no">№ 06</span> · CANGSHAN, DALI</span></figcaption></figure></div>
+        <div class="col"><figure><div class="imgwrap"><img src="img/erhai-arch.jpg" alt="Peace sign under a flower arch over Erhai" data-par></div><figcaption><span class="cap-cn">大理</span><span class="cap-meta"><span class="no">№ 07</span> · ERHAI LAKE</span></figcaption></figure></div>
+      </div>
+
+      <figure class="shot wide reveal" data-rise>
+        <div class="imgwrap"><img src="img/zhangye.jpg" alt="Above the rainbow mountains of Zhangye Danxia" data-par></div>
+        <figcaption><span class="cap-cn">张掖</span><span class="cap-meta"><span class="no">№ 08</span> · <span class="en">ZHANGYE DANXIA, GANSU · FEB 2025</span><span class="zh">张掖丹霞，甘肃 · 2025.02</span></span></figcaption>
+      </figure>
+
+      <figure class="shot off right reveal" data-rise>
+        <div class="imgwrap"><img src="img/desert-stand.jpg" alt="Standing on a dune in the Tengger Desert" data-par></div>
+        <div class="side">
+          <div class="big cn">腾格里</div>
+          <div class="txt"><span class="en">Inner Mongolia. February. A whole sea of sand and a sky with nothing in it.</span><span class="zh">内蒙古，二月。一整片沙的海，和一片什么都没有的天。</span></div>
+          <div class="meta"><span class="no" style="color:var(--seal)">№ 09</span> · <span class="en">TENGGER DESERT · FEB 2025</span><span class="zh">腾格里沙漠 · 2025.02</span></div>
+        </div>
+      </figure>
+
+      <div class="shot pair reveal" data-rise>
+        <div class="col"><figure><div class="imgwrap"><img src="img/camel-snow.jpg" alt="A camel walking with snow mountains behind" data-par></div><figcaption><span class="cap-cn">驼</span><span class="cap-meta"><span class="no">№ 10</span> · TENGGER DESERT</span></figcaption></figure></div>
+        <div class="col"><figure><div class="imgwrap"><img src="img/camel-face.jpg" alt="A Bactrian camel facing the camera" data-par></div><figcaption><span class="cap-cn">驼</span><span class="cap-meta"><span class="no">№ 11</span> · TENGGER DESERT</span></figcaption></figure></div>
+      </div>
+
+      <figure class="shot off reveal" data-rise>
+        <div class="imgwrap"><img src="img/xixia-tombs.jpg" alt="The Western Xia imperial tombs against mountains" data-par></div>
+        <div class="side">
+          <div class="big cn">西夏王陵</div>
+          <div class="txt"><span class="en">A thousand years of earth pyramids, still standing in Ningxia.</span><span class="zh">一千年的夯土金字塔，至今立在宁夏的旷野里。</span></div>
+          <div class="meta"><span class="no" style="color:var(--seal)">№ 12</span> · <span class="en">WESTERN XIA TOMBS, NINGXIA · FEB 2025</span><span class="zh">西夏王陵，宁夏 · 2025.02</span></div>
+        </div>
+      </figure>
+
+      <div class="interlude reveal" data-rise>
+        <p class="q"><span class="mark">「</span><span class="en">From a glacier lake to a desert in the same year — I just like being where the air changes.</span><span class="zh">同一年里，从冰川湖走到沙漠——我大概只是喜欢待在空气会变的地方。</span><span class="mark">」</span></p>
+      </div>
+
+      <div class="shot pair reveal" data-rise>
+        <div class="col"><figure><div class="imgwrap"><img src="img/shanghai.jpg" alt="Night portrait under the towers of Lujiazui" data-par></div><figcaption><span class="cap-cn">陆家嘴</span><span class="cap-meta"><span class="no">№ 13</span> · SHANGHAI</span></figcaption></figure></div>
+        <div class="col"><figure><div class="imgwrap"><img src="img/hongkong.jpg" alt="Portrait against Victoria Harbour" data-par></div><figcaption><span class="cap-cn">维港</span><span class="cap-meta"><span class="no">№ 14</span> · HONG KONG</span></figcaption></figure></div>
+      </div>
+
+      <figure class="shot wide reveal" data-rise>
+        <div class="imgwrap"><img src="img/nyc-night.jpg" alt="Night portrait above the Manhattan skyline" data-par></div>
+        <figcaption><span class="cap-cn">纽约</span><span class="cap-meta"><span class="no">№ 15</span> · <span class="en">TOP OF THE ROCK, NYC · MAR 2026</span><span class="zh">洛克菲勒之巅，纽约 · 2026.03</span></span></figcaption>
+      </figure>
+
+      <figure class="shot off right reveal" data-rise>
+        <div class="imgwrap"><img src="img/cascades-snow.jpg" alt="Photographing a snow-covered forest" data-par></div>
+        <div class="side">
+          <div class="big cn">雪林</div>
+          <div class="txt"><span class="en">Back in the Cascades, photographing the snow as it fell.</span><span class="zh">回到喀斯喀特山，拍下正在落的雪。</span></div>
+          <div class="meta"><span class="no" style="color:var(--seal)">№ 16</span> · <span class="en">CASCADES, WA · DEC 2025</span><span class="zh">喀斯喀特山 · 2025.12</span></div>
+        </div>
+      </figure>
+
+      <div class="shot pair reveal" data-rise>
+        <div class="col"><figure><div class="imgwrap"><img src="img/moon.jpg" alt="Silhouette with arms open against a giant moon" data-par></div><figcaption><span class="cap-cn">月</span><span class="cap-meta"><span class="no">№ 17</span> · A BORROWED MOON</span></figcaption></figure></div>
+        <div class="col"><figure><div class="imgwrap"><img src="img/joffre-rock.jpg" alt="Sitting on a boulder by a glacier lake" data-par></div><figcaption><span class="cap-cn">乔佛里</span><span class="cap-meta"><span class="no">№ 18</span> · JOFFRE LAKES</span></figcaption></figure></div>
+      </div>
+
+      <figure class="shot wide reveal" data-rise>
+        <div class="imgwrap"><img src="img/aurora.jpg" alt="Aurora over a dark treeline" data-par></div>
+        <figcaption><span class="cap-cn">极光</span><span class="cap-meta"><span class="no">№ 19</span> · <span class="en">AURORA OVER THE PNW · JUL 2024</span><span class="zh">太平洋西北的极光 · 2024.07</span></span></figcaption>
+      </figure>
+
+    </div>
+  </section>
+</div>
+
+  <!-- RÉSUMÉ CTA -->
+  <section class="resume-cta">
+    <div class="wrap">
+      <div class="small label reveal" data-rise><span class="en">For recruiters &amp; hiring managers</span><span class="zh">给招聘方</span></div>
+      <h2 class="reveal" data-rise><span class="en">Here for the <em>work</em>? The pipelines, models, and dashboards live on their own page.</span><span class="zh">为<em>工作</em>而来？管道、模型和看板，都在它们自己的页面上。</span></h2>
+      <a class="btn-seal reveal" data-rise href="resume/"><span class="cn" style="font-size:22px;">胡</span><span><span class="en">Open the résumé</span><span class="zh">打开简历</span></span><span class="arr">→</span></a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-top">
+        <p class="big reveal" data-rise><span class="en">Building something, hiring, or just want to talk light and data? <a class="" href="mailto:hjinhao066@gmail.com">Write to me.</a></span><span class="zh">在做什么项目、在招人，或者只想聊聊光和数据？<a href="mailto:hjinhao066@gmail.com">给我写信。</a></span></p>
+        <div class="foot-links reveal" data-rise>
+          <a class="u" href="mailto:hjinhao066@gmail.com">EMAIL</a>
+          <a class="u" href="https://github.com/hjinhao066" target="_blank" rel="noopener">GITHUB</a>
+          <a class="u" href="https://www.linkedin.com/in/jinhao-hu-uw" target="_blank" rel="noopener">LINKEDIN</a>
+        </div>
+      </div>
+      <div class="foot-meta">
+        <span class="colophon"><span class="en">All photographs mine. Set in Fraunces &amp; Ma Shan Zheng · one HTML file, no trackers.</span><span class="zh">照片均为本人拍摄。字体 Fraunces 与马善政 · 单一 HTML 文件，无追踪。</span></span>
+        <span>SEATTLE · 47.6°N, 122.3°W</span>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<!-- interactive seal -->
+<div class="seal-dock" id="sealDock">
+  <span class="seal-hint"><span class="en">press the seal</span><span class="zh">按一下印</span></span>
+  <div class="seal-menu">
+    <a class="seal-item i1" href="#about"><span class="cn">一</span></a>
+    <a class="seal-item i2" href="#building"><span class="cn">二</span></a>
+    <a class="seal-item i3" href="#field"><span class="cn">三</span></a>
+    <a class="seal-item i4" href="resume/"><span><span class="en">CV</span><span class="zh">简历</span></span></a>
+    <a class="seal-item i5" href="mailto:hjinhao066@gmail.com"><span>@</span></a>
+  </div>
+  <button class="seal-btn" id="sealBtn" aria-label="Personal seal — menu">胡</button>
+</div>
+
+<!-- libs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+  /* ---------- language ---------- */
+  const saved = localStorage.getItem('lang');
+  document.documentElement.dataset.lang = saved === 'zh' ? 'zh' : 'en';
+  function toggleLang() {
+    const next = document.documentElement.dataset.lang === 'en' ? 'zh' : 'en';
+    document.documentElement.dataset.lang = next;
+    document.documentElement.lang = next === 'zh' ? 'zh-CN' : 'en';
+    localStorage.setItem('lang', next);
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  }
+
+  /* ---------- still mode for screenshots ---------- */
+  const STILL = location.search.includes('still');
+  if (STILL) document.documentElement.classList.add('still');
+
+  /* ---------- interactive seal ---------- */
+  const dock = document.getElementById('sealDock');
+  const sealBtn = document.getElementById('sealBtn');
+  let menuOpen = false;
+  function openMenu(){ menuOpen = true; dock.classList.add('open'); }
+  function closeMenu(){ menuOpen = false; dock.classList.remove('open'); }
+  dock.addEventListener('mouseenter', openMenu);
+  dock.addEventListener('mouseleave', closeMenu);
+  if (location.search.includes('sealopen')) openMenu();
+  sealBtn.addEventListener('click', (e) => {
+    // ink stamp effect
+    sealBtn.classList.remove('stamp'); void sealBtn.offsetWidth; sealBtn.classList.add('stamp');
+    const r = sealBtn.getBoundingClientRect();
+    const splash = document.createElement('div');
+    splash.className = 'ink-splash';
+    splash.style.left = (r.left + r.width/2) + 'px';
+    splash.style.top = (r.top + r.height/2) + 'px';
+    document.body.appendChild(splash);
+    requestAnimationFrame(()=> splash.classList.add('go'));
+    setTimeout(()=> splash.remove(), 650);
+    // toggle the radial menu on click too (mobile / tap)
+    menuOpen ? closeMenu() : openMenu();
+  });
+  // tap outside closes on touch
+  document.addEventListener('click', (e)=>{ if(!dock.contains(e.target)) closeMenu(); });
+
+  /* ---------- motion (guarded) ---------- */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!STILL && !reduce && window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* Lenis smooth scroll */
+    if (window.Lenis) {
+      const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((t)=> lenis.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
+      // anchor links through lenis
+      document.querySelectorAll('a[href^="#"]').forEach(a=>{
+        a.addEventListener('click', e=>{
+          const id = a.getAttribute('href');
+          if (id.length > 1) { e.preventDefault(); lenis.scrollTo(id, { offset: -10 }); closeMenu(); }
+        });
+      });
+    }
+
+    /* reveal on scroll */
+    gsap.utils.toArray('.reveal').forEach((el)=>{
+      gsap.fromTo(el, { y: 46, opacity: 0 }, {
+        y: 0, opacity: 1, duration: 1.1, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      });
+    });
+
+    /* clip-path wipe reveal on each photo (award-winning "pulled open") */
+    gsap.utils.toArray('.shot .imgwrap').forEach((wrap)=>{
+      gsap.fromTo(wrap, { clipPath: 'inset(100% 0% 0% 0%)' }, {
+        clipPath: 'inset(0% 0% 0% 0%)', duration: 1.25, ease: 'power3.out',
+        scrollTrigger: { trigger: wrap, start: 'top 86%', once: true }
+      });
+    });
+
+    /* gentle parallax on photos */
+    gsap.utils.toArray('img[data-par]').forEach((img)=>{
+      gsap.fromTo(img, { scale: 1.14, yPercent: -7 }, {
+        scale: 1, yPercent: 7, ease: 'none',
+        scrollTrigger: { trigger: img.closest('.imgwrap'), start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+    });
+
+    /* hero subtle settle */
+    gsap.from('.hero-cn', { scale: 1.04, duration: 1.6, ease: 'power3.out' });
+  } else {
+    // ensure everything visible if libs failed
+    document.querySelectorAll('.reveal').forEach(el=> el.style.opacity = 1);
+  }
+</script>
+</body>
+</html>
