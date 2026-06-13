@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23c5402a'/%3E%3Ctext x='32' y='47' font-family='serif' font-weight='700' font-size='40' fill='%23f4ecda' text-anchor='middle'%3E%E8%83%A1%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>document.documentElement.className = 'js';</script>
 <style>
   :root {
@@ -30,6 +30,7 @@
     --serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
     --sans: 'Jost', 'Noto Serif SC', system-ui, sans-serif;
     --cal: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+    --cursive: 'Zhi Mang Xing', 'Ma Shan Zheng', cursive, serif;
     --zh: 'Noto Serif SC', serif;
   }
 
@@ -198,8 +199,14 @@
 
   /* interactive seal */
   .seal-dock { position: fixed; right: 34px; bottom: 34px; z-index: 50; width: 88px; height: 88px; }
-  .seal-btn { position: absolute; inset: 0; z-index: 3; background: var(--seal); color: #f4ecda; border: none; cursor: pointer; font-family: var(--cal); font-size: 52px; line-height: 1; border-radius: 5px; box-shadow: inset 0 0 18px rgba(40,5,0,.5), 0 10px 30px rgba(0,0,0,.5); transition: transform .18s cubic-bezier(.34,1.56,.64,1); display: flex; align-items: center; justify-content: center; }
-  .seal-btn::after { content:''; position:absolute; inset:5px; border:1.5px solid rgba(244,236,218,.5); border-radius:3px; }
+  .seal-btn { position: absolute; inset: 0; z-index: 3; background:
+      radial-gradient(120% 120% at 30% 20%, #d24e34 0%, var(--seal) 45%, var(--seal-deep) 100%);
+      color: var(--gold); border: none; cursor: grab; font-family: var(--cursive); font-size: 58px; line-height: 1; border-radius: 6px 5px 7px 5px;
+      box-shadow: inset 0 0 22px rgba(40,5,0,.55), inset 0 2px 3px rgba(255,180,150,.25), 0 12px 32px rgba(0,0,0,.55); transition: transform .18s cubic-bezier(.34,1.56,.64,1); display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; }
+  .seal-btn::after { content:''; position:absolute; inset:5px; border:1.5px solid rgba(244,236,218,.45); border-radius:4px 3px 5px 3px; }
+  .seal-btn::before { content:''; position:absolute; inset:0; border-radius:6px 5px 7px 5px; mix-blend-mode:overlay; opacity:.5; pointer-events:none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E"); }
+  .seal-dock.dragging .seal-btn { cursor: grabbing; }
   .seal-btn:hover { transform: scale(1.06) rotate(-3deg); }
   .seal-btn.press { animation: press .5s ease; }
   @keyframes press { 0%{transform:scale(1)} 22%{transform:scale(.82) rotate(4deg)} 50%{transform:scale(1.1) rotate(-2deg)} 100%{transform:scale(1)} }
@@ -218,24 +225,22 @@
   .seal-dock.open .seal-item.i4 { transform: translate(-50%,-50%) translate(-108px,-48px) scale(1); --x:-108px; --y:-48px; }
   .seal-dock.open .seal-item.i5 { transform: translate(-50%,-50%) translate(-118px,2px) scale(1); --x:-118px; --y:2px; }
 
-  /* ink ripple + stamp imprint */
-  .ink-layer { position: fixed; inset: 0; z-index: 48; pointer-events: none; }
-  .ripple { position: absolute; border-radius: 50%; border: 2px solid var(--seal); transform: translate(-50%,-50%) scale(0); opacity: .7; }
-  .ripple.go { animation: ripple 1s cubic-bezier(.2,.7,.3,1) forwards; }
-  @keyframes ripple { to { transform: translate(-50%,-50%) scale(1); opacity: 0; } }
-  .droplet { position: absolute; width: 9px; height: 9px; border-radius: 50% 48% 52% 50%; background: var(--seal-deep); transform: translate(-50%,-50%); opacity: .85; }
-  .droplet.go { animation: drop .7s ease-out forwards; }
-  @keyframes drop { to { opacity: 0; } }
-  .stamp-print { position: fixed; left: 50%; top: 46%; z-index: 49; pointer-events: none; width: 168px; height: 168px; transform: translate(-50%,-50%) scale(1.25); opacity: 0; background: var(--seal); color: #f4ecda; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--cal); font-size: 116px; box-shadow: inset 0 0 30px rgba(40,5,0,.55); }
-  .stamp-print::after { content:''; position:absolute; inset:9px; border:2.5px solid rgba(244,236,218,.55); border-radius:7px; }
-  .stamp-print.go { animation: stampprint 1.5s cubic-bezier(.3,.8,.3,1) forwards; }
-  @keyframes stampprint {
-    0% { opacity: 0; transform: translate(-50%,-50%) scale(1.3) rotate(-6deg); filter: blur(6px); }
-    18% { opacity: .96; transform: translate(-50%,-50%) scale(.96) rotate(2deg); filter: blur(0); }
-    30% { transform: translate(-50%,-50%) scale(1) rotate(0deg); }
-    72% { opacity: .92; }
-    100% { opacity: 0; transform: translate(-50%,-50%) scale(1.04) rotate(0deg); }
+  /* stamp imprints — just the 胡 glyph, gold ink, persists ~10s then fades */
+  .ink-layer { position: fixed; inset: 0; z-index: 47; pointer-events: none; }
+  .chop { position: fixed; pointer-events: none; font-family: var(--cursive); color: var(--gold);
+    line-height: 1; opacity: 0; transform: translate(-50%,-50%) scale(1.25) rotate(var(--r,0deg));
+    text-shadow: 0 3px 20px rgba(0,0,0,.6), 0 0 3px rgba(0,0,0,.5); will-change: opacity, transform, filter; }
+  .chop.go { animation: chop 10s cubic-bezier(.2,.7,.3,1) forwards; }
+  @keyframes chop {
+    0%   { opacity: 0; transform: translate(-50%,-50%) scale(1.28) rotate(var(--r,0deg)); filter: blur(5px); }
+    5%   { opacity: 1; transform: translate(-50%,-50%) scale(.95) rotate(var(--r,0deg)); filter: blur(0); }
+    9%   { transform: translate(-50%,-50%) scale(1) rotate(var(--r,0deg)); }
+    78%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1.03) rotate(var(--r,0deg)); }
   }
+  .ring { position: fixed; border-radius: 50%; border: 2px solid var(--gold); transform: translate(-50%,-50%) scale(0); opacity: .55; pointer-events: none; }
+  .ring.go { animation: ring .7s cubic-bezier(.2,.7,.3,1) forwards; }
+  @keyframes ring { to { transform: translate(-50%,-50%) scale(1); opacity: 0; } }
 
   @media (max-width: 900px) {
     body { font-size: 16px; }
@@ -355,9 +360,10 @@
         <div class="stack">RSS · Agents · Telegram · Cron</div>
       </div>
       <div class="build">
-        <div class="top"><h3>AgentDeck</h3><span class="tag"><span class="en">Personal</span><span class="zh">自用</span></span></div>
-        <p><span class="en">A TweetDeck-style command center for terminals — many AI agents, side by side in columns, each its own live shell.</span><span class="zh">一个 TweetDeck 风格的终端指挥台——多个 AI agent 并排成列，每一列都是独立的实时 shell。</span></p>
-        <div class="stack">Electron · xterm.js · node-pty</div>
+        <div class="top"><h3>X&nbsp;Deck</h3><span class="tag live"><span class="en">Open Source · 10★</span><span class="zh">开源 · 10★</span></span></div>
+        <p><span class="en">A DIY multi-column deck for X (Twitter) — a TweetDeck / X&nbsp;Pro alternative for Mac &amp; Windows. Picked up stars and a small following on X.</span><span class="zh">一个 DIY 多列 X（推特）面板——给 Mac 和 Windows 的 TweetDeck / X&nbsp;Pro 替代品。在推特上收获了 star 和一些关注。</span></p>
+        <div class="stack">Electron · Multi-column · Win + Mac</div>
+        <a class="go" href="https://github.com/hjinhao066/xdeck-diy" target="_blank" rel="noopener">github.com/hjinhao066/xdeck-diy ↗</a>
       </div>
       <div class="build">
         <div class="top"><h3><span class="en">The Data Stack</span><span class="zh">数据栈</span></h3><span class="tag"><span class="en">Craft</span><span class="zh">本行</span></span></div>
@@ -382,7 +388,7 @@
 
     <div class="gallery">
 
-      <!-- 01 note: Joffre arms -->
+      <!-- 01 note R: Joffre arms -->
       <figure class="note right reveal" data-rise>
         <div class="imgwrap"><img src="img/joffre-arms.jpg" alt="Arms wide on a log over a turquoise glacier lake"></div>
         <div class="side">
@@ -398,77 +404,61 @@
         <figure><div class="imgwrap"><img src="img/smith-rock.jpg" alt="Sitting on a cliff edge at Smith Rock"></div><div class="cap"><span class="cap-name"><span class="zh">崖</span><span class="en">Smith Rock</span></span><span class="cap-meta"><span class="no">№ 03</span> · OREGON</span></div></figure>
       </div>
 
-      <!-- 04 feat: Rainier log -->
-      <figure class="feat reveal" data-rise>
-        <div class="imgwrap"><img src="img/rainier-log.jpg" alt="Resting on a log in the snow at Mount Rainier"></div>
-        <div class="cap"><span class="cap-name"><span class="zh">瑞尼尔</span><span class="en">Mount Rainier</span></span><span class="cap-meta"><span class="no">№ 04</span> · <span class="en">MOUNT RAINIER NP, WA · DEC 2025</span><span class="zh">瑞尼尔雪山，WA · 2025.12</span></span></div>
-      </figure>
-
-      <!-- 05 note left: Franklin Falls -->
+      <!-- 04 note L: Franklin Falls -->
       <figure class="note reveal" data-rise>
         <div class="imgwrap"><img src="img/franklin-falls.jpg" alt="Arms open before a frozen waterfall"></div>
         <div class="side">
           <div class="big"><span class="zh cal">冰瀑</span><span class="en">Frozen</span></div>
           <div class="txt"><span class="en">A waterfall caught mid-freeze. Stand close enough and the cold has a sound.</span><span class="zh">一条被冻在半空的瀑布。站得够近，连寒冷都有声音。</span></div>
-          <div class="meta"><span class="no">№ 05</span> · <span class="en">FRANKLIN FALLS, WA · FEB 2026</span><span class="zh">富兰克林瀑布 · 2026.02</span></div>
+          <div class="meta"><span class="no">№ 04</span> · <span class="en">FRANKLIN FALLS, WA · FEB 2026</span><span class="zh">富兰克林瀑布 · 2026.02</span></div>
         </div>
       </figure>
 
-      <!-- 06-07 duo -->
-      <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/rainier-sit.jpg" alt="Sitting in the snow at Mount Rainier"></div><div class="cap"><span class="cap-name"><span class="zh">雪</span><span class="en">Rainier</span></span><span class="cap-meta"><span class="no">№ 06</span> · WASHINGTON</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/joffre-rock.jpg" alt="Sitting on a boulder by a glacier lake"></div><div class="cap"><span class="cap-name"><span class="zh">石</span><span class="en">Joffre Lakes</span></span><span class="cap-meta"><span class="no">№ 07</span> · BC</span></div></figure>
-      </div>
+      <!-- 05 feat: Seattle skyline -->
+      <figure class="feat reveal" data-rise>
+        <div class="imgwrap"><img src="img/seattle-skyline.jpg" alt="Seattle skyline and the Space Needle at golden hour"></div>
+        <div class="cap"><span class="cap-name"><span class="zh">西雅图</span><span class="en">Seattle</span></span><span class="cap-meta"><span class="no">№ 05</span> · <span class="en">KERRY PARK, SEATTLE · MAY 2026</span><span class="zh">凯里公园，西雅图 · 2026.05</span></span></div>
+      </figure>
 
       <div class="interlude reveal" data-rise>
         <p class="q"><span class="mark">「</span><span class="en">The best datasets and the best views share one thing: you have to hike to them.</span><span class="zh">最好的数据和最好的风景有个共同点——都得自己走过去。</span><span class="mark">」</span></p>
       </div>
 
-      <!-- 08 note right: Erhai trees -->
+      <!-- 06 note R: Erhai trees -->
       <figure class="note right reveal" data-rise>
         <div class="imgwrap"><img src="img/erhai-trees.jpg" alt="By the dawn-redwood water trees of Erhai Lake"></div>
         <div class="side">
           <div class="big"><span class="zh cal">洱海</span><span class="en">Erhai</span></div>
           <div class="txt"><span class="en">Dali, where the lake is so wide it borrows the whole sky — and trees grow straight out of the water.</span><span class="zh">大理。湖面宽到把整片天空都借走，连树都从水里长出来。</span></div>
-          <div class="meta"><span class="no">№ 08</span> · <span class="en">ERHAI LAKE, DALI · JUN 2023</span><span class="zh">洱海，大理 · 2023.06</span></div>
+          <div class="meta"><span class="no">№ 06</span> · <span class="en">ERHAI LAKE, DALI · JUN 2023</span><span class="zh">洱海，大理 · 2023.06</span></div>
         </div>
       </figure>
 
-      <!-- 09-10 duo -->
+      <!-- 07-08 duo -->
       <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/erhai-profile.jpg" alt="Sitting by Erhai Lake looking out"></div><div class="cap"><span class="cap-name"><span class="zh">岸</span><span class="en">Erhai Lake</span></span><span class="cap-meta"><span class="no">№ 09</span> · DALI</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/dali-cangshan.jpg" alt="Farmland under the Cangshan range"></div><div class="cap"><span class="cap-name"><span class="zh">苍山</span><span class="en">Cangshan</span></span><span class="cap-meta"><span class="no">№ 10</span> · DALI</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/erhai-profile.jpg" alt="Sitting by Erhai Lake looking out"></div><div class="cap"><span class="cap-name"><span class="zh">岸</span><span class="en">Erhai Lake</span></span><span class="cap-meta"><span class="no">№ 07</span> · DALI</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/dali-cangshan.jpg" alt="Farmland under the Cangshan range"></div><div class="cap"><span class="cap-name"><span class="zh">苍山</span><span class="en">Cangshan</span></span><span class="cap-meta"><span class="no">№ 08</span> · DALI</span></div></figure>
       </div>
 
-      <!-- 11 feat: Zhangye (portrait, capped) -->
-      <figure class="feat reveal" data-rise>
-        <div class="imgwrap"><img src="img/zhangye.jpg" alt="Above the rainbow mountains of Zhangye Danxia"></div>
-        <div class="cap"><span class="cap-name"><span class="zh">张掖</span><span class="en">Zhangye Danxia</span></span><span class="cap-meta"><span class="no">№ 11</span> · <span class="en">ZHANGYE, GANSU · FEB 2025</span><span class="zh">张掖丹霞，甘肃 · 2025.02</span></span></div>
-      </figure>
-
-      <!-- 12 note right: Desert -->
-      <figure class="note right reveal" data-rise>
-        <div class="imgwrap"><img src="img/desert-stand.jpg" alt="Standing on a dune in the Tengger Desert"></div>
-        <div class="side">
-          <div class="big"><span class="zh cal">腾格里</span><span class="en">Tengger</span></div>
-          <div class="txt"><span class="en">Inner Mongolia, February. A whole sea of sand and a sky with nothing in it.</span><span class="zh">内蒙古，二月。一整片沙的海，和一片什么都没有的天。</span></div>
-          <div class="meta"><span class="no">№ 12</span> · <span class="en">TENGGER DESERT · FEB 2025</span><span class="zh">腾格里沙漠 · 2025.02</span></div>
-        </div>
-      </figure>
-
-      <!-- 13-14 duo camels -->
+      <!-- 09-10 duo: Zhangye + Desert, both portrait, side by side -->
       <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/camel-snow.jpg" alt="A camel walking with snow mountains behind"></div><div class="cap"><span class="cap-name"><span class="zh">驼</span><span class="en">Bactrian</span></span><span class="cap-meta"><span class="no">№ 13</span> · TENGGER</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/camel-face.jpg" alt="A Bactrian camel facing the camera"></div><div class="cap"><span class="cap-name"><span class="zh">驼</span><span class="en">Bactrian</span></span><span class="cap-meta"><span class="no">№ 14</span> · TENGGER</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/zhangye.jpg" alt="Above the rainbow mountains of Zhangye Danxia"></div><div class="cap"><span class="cap-name"><span class="zh">张掖</span><span class="en">Zhangye Danxia</span></span><span class="cap-meta"><span class="no">№ 09</span> · GANSU</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/desert-stand.jpg" alt="Standing on a dune in the Tengger Desert"></div><div class="cap"><span class="cap-name"><span class="zh">腾格里</span><span class="en">Tengger Desert</span></span><span class="cap-meta"><span class="no">№ 10</span> · INNER MONGOLIA</span></div></figure>
       </div>
 
-      <!-- 15 note left: Western Xia -->
+      <!-- 11-12 duo camels -->
+      <div class="duo reveal" data-rise>
+        <figure><div class="imgwrap"><img src="img/camel-snow.jpg" alt="A camel walking with snow mountains behind"></div><div class="cap"><span class="cap-name"><span class="zh">驼</span><span class="en">Bactrian</span></span><span class="cap-meta"><span class="no">№ 11</span> · TENGGER</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/camel-face.jpg" alt="A Bactrian camel facing the camera"></div><div class="cap"><span class="cap-name"><span class="zh">驼</span><span class="en">Bactrian</span></span><span class="cap-meta"><span class="no">№ 12</span> · TENGGER</span></div></figure>
+      </div>
+
+      <!-- 13 note L: Western Xia -->
       <figure class="note reveal" data-rise>
         <div class="imgwrap"><img src="img/xixia-tombs.jpg" alt="The Western Xia imperial tombs against mountains"></div>
         <div class="side">
           <div class="big"><span class="zh cal">西夏</span><span class="en">Western Xia</span></div>
           <div class="txt"><span class="en">A thousand years of earth pyramids, still standing in Ningxia.</span><span class="zh">一千年的夯土金字塔，至今立在宁夏的旷野里。</span></div>
-          <div class="meta"><span class="no">№ 15</span> · <span class="en">WESTERN XIA TOMBS, NINGXIA · FEB 2025</span><span class="zh">西夏王陵，宁夏 · 2025.02</span></div>
+          <div class="meta"><span class="no">№ 13</span> · <span class="en">WESTERN XIA TOMBS, NINGXIA · FEB 2025</span><span class="zh">西夏王陵，宁夏 · 2025.02</span></div>
         </div>
       </figure>
 
@@ -476,23 +466,29 @@
         <p class="q"><span class="mark">「</span><span class="en">From a glacier lake to a desert in the same year — I just like being where the air changes.</span><span class="zh">同一年里，从冰川湖走到沙漠——我大概只是喜欢待在空气会变的地方。</span><span class="mark">」</span></p>
       </div>
 
-      <!-- 16-17 duo cities -->
+      <!-- 14-15 duo cities -->
       <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/shanghai.jpg" alt="Night portrait under the towers of Lujiazui"></div><div class="cap"><span class="cap-name"><span class="zh">沪</span><span class="en">Shanghai</span></span><span class="cap-meta"><span class="no">№ 16</span> · LUJIAZUI</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/hongkong.jpg" alt="Portrait against Victoria Harbour"></div><div class="cap"><span class="cap-name"><span class="zh">港</span><span class="en">Hong Kong</span></span><span class="cap-meta"><span class="no">№ 17</span> · VICTORIA HARBOUR</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/shanghai.jpg" alt="Night portrait under the towers of Lujiazui"></div><div class="cap"><span class="cap-name"><span class="zh">沪</span><span class="en">Shanghai</span></span><span class="cap-meta"><span class="no">№ 14</span> · LUJIAZUI</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/hongkong.jpg" alt="Portrait against Victoria Harbour"></div><div class="cap"><span class="cap-name"><span class="zh">港</span><span class="en">Hong Kong</span></span><span class="cap-meta"><span class="no">№ 15</span> · VICTORIA HARBOUR</span></div></figure>
       </div>
 
-      <!-- 18 feat: NYC -->
+      <!-- 16 feat: NYC -->
       <figure class="feat reveal" data-rise>
         <div class="imgwrap"><img src="img/nyc-night.jpg" alt="Night portrait above the Manhattan skyline"></div>
-        <div class="cap"><span class="cap-name"><span class="zh">纽约</span><span class="en">New York</span></span><span class="cap-meta"><span class="no">№ 18</span> · <span class="en">TOP OF THE ROCK, NYC · MAR 2026</span><span class="zh">洛克菲勒之巅，纽约 · 2026.03</span></span></div>
+        <div class="cap"><span class="cap-name"><span class="zh">纽约</span><span class="en">New York</span></span><span class="cap-meta"><span class="no">№ 16</span> · <span class="en">TOP OF THE ROCK, NYC · MAR 2026</span><span class="zh">洛克菲勒之巅，纽约 · 2026.03</span></span></div>
       </figure>
 
-      <!-- 19-20 duo sky -->
+      <!-- 17-18 duo sky -->
       <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/moon.jpg" alt="Silhouette with arms open against a giant moon"></div><div class="cap"><span class="cap-name"><span class="zh">月</span><span class="en">The Moon</span></span><span class="cap-meta"><span class="no">№ 19</span> · A BORROWED MOON</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/aurora.jpg" alt="Aurora over a dark treeline"></div><div class="cap"><span class="cap-name"><span class="zh">极光</span><span class="en">Aurora</span></span><span class="cap-meta"><span class="no">№ 20</span> · PACIFIC NORTHWEST</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/moon.jpg" alt="Silhouette with arms open against a giant moon"></div><div class="cap"><span class="cap-name"><span class="zh">月</span><span class="en">The Moon</span></span><span class="cap-meta"><span class="no">№ 17</span> · A BORROWED MOON</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/aurora.jpg" alt="Aurora over a dark treeline"></div><div class="cap"><span class="cap-name"><span class="zh">极光</span><span class="en">Aurora</span></span><span class="cap-meta"><span class="no">№ 18</span> · PACIFIC NORTHWEST</span></div></figure>
       </div>
+
+      <!-- 19 feat: Joffre rock, closer -->
+      <figure class="feat reveal" data-rise>
+        <div class="imgwrap"><img src="img/joffre-rock.jpg" alt="Sitting on a boulder by a glacier lake"></div>
+        <div class="cap"><span class="cap-name"><span class="zh">乔佛里</span><span class="en">Back at Joffre</span></span><span class="cap-meta"><span class="no">№ 19</span> · <span class="en">JOFFRE LAKES, BC · AUG 2024</span><span class="zh">乔佛里湖，BC · 2024.08</span></span></div>
+      </figure>
 
     </div>
   </section>
@@ -508,7 +504,7 @@
   </section>
 
   <!-- FOOTER -->
-  <footer>
+  <footer id="contact">
     <div class="wrap">
       <div class="foot-top">
         <p class="big reveal" data-rise><span class="en">Building something, hiring, or just want to talk light and data? <a href="mailto:hjinhao066@gmail.com">Write to me.</a></span><span class="zh">在做什么项目、在招人，或者只想聊聊光和数据？<a href="mailto:hjinhao066@gmail.com">给我写信。</a></span></p>
@@ -528,13 +524,13 @@
 
 <!-- interactive seal -->
 <div class="seal-dock" id="sealDock">
-  <span class="seal-hint"><span class="en">press the seal</span><span class="zh">按一下印</span></span>
+  <span class="seal-hint"><span class="en">drag · press to stamp</span><span class="zh">可拖动 · 按一下盖章</span></span>
   <div class="seal-menu">
     <a class="seal-item i1" href="#about"><span class="zh cal">一</span><span class="en num">01</span></a>
     <a class="seal-item i2" href="#building"><span class="zh cal">二</span><span class="en num">02</span></a>
     <a class="seal-item i3" href="#field"><span class="zh cal">三</span><span class="en num">03</span></a>
     <a class="seal-item i4" href="resume/"><span>CV</span></a>
-    <a class="seal-item i5" href="mailto:hjinhao066@gmail.com"><span>@</span></a>
+    <a class="seal-item i5" href="#contact"><span>@</span></a>
   </div>
   <button class="seal-btn" id="sealBtn" aria-label="Personal seal — menu">胡</button>
 </div>
@@ -576,49 +572,66 @@
   });
   if (location.search.includes('sealopen')) openMenu();
 
-  function inkBurst(cx, cy){
-    // concentric ripples
-    [ [150,0], [240,0.12], [340,0.26] ].forEach(([size,delay])=>{
-      const r = document.createElement('div');
-      r.className = 'ripple';
-      r.style.left = cx+'px'; r.style.top = cy+'px';
-      r.style.width = r.style.height = size+'px';
-      r.style.animationDelay = delay+'s';
-      inkLayer.appendChild(r);
-      requestAnimationFrame(()=> r.classList.add('go'));
-      setTimeout(()=> r.remove(), 1200);
-    });
-    // splatter droplets
-    for (let i=0;i<10;i++){
-      const ang = Math.PI * (0.9 + Math.random()*1.2) * -1; // upward-ish arc
-      const dist = 60 + Math.random()*120;
-      const d = document.createElement('div');
-      d.className = 'droplet';
-      const s = 5 + Math.random()*10;
-      d.style.width = d.style.height = s+'px';
-      d.style.left = cx+'px'; d.style.top = cy+'px';
-      inkLayer.appendChild(d);
-      requestAnimationFrame(()=>{
-        d.classList.add('go');
-        d.style.transition = 'transform .7s cubic-bezier(.2,.6,.3,1), opacity .7s ease';
-        d.style.transform = `translate(-50%,-50%) translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist}px) scale(${0.4+Math.random()})`;
-      });
-      setTimeout(()=> d.remove(), 760);
-    }
-    // stamped 胡 imprint
-    const print = document.createElement('div');
-    print.className = 'stamp-print';
-    print.textContent = '胡';
-    document.body.appendChild(print);
-    requestAnimationFrame(()=> print.classList.add('go'));
-    setTimeout(()=> print.remove(), 1550);
+  // stamp the 胡 glyph (gold ink, glyph only) wherever the seal is pressed; it lingers ~10s then fades
+  function stampAt(cx, cy){
+    const ring = document.createElement('div');
+    ring.className = 'ring';
+    ring.style.left = cx+'px'; ring.style.top = cy+'px';
+    ring.style.width = ring.style.height = '120px';
+    inkLayer.appendChild(ring);
+    requestAnimationFrame(()=> ring.classList.add('go'));
+    setTimeout(()=> ring.remove(), 760);
+
+    const chop = document.createElement('div');
+    chop.className = 'chop';
+    chop.textContent = '胡';
+    const size = 88 + Math.round(Math.random()*26);   // slight size variety
+    chop.style.fontSize = size + 'px';
+    chop.style.left = cx+'px'; chop.style.top = cy+'px';
+    chop.style.setProperty('--r', (Math.random()*10 - 5).toFixed(1) + 'deg'); // organic tilt
+    inkLayer.appendChild(chop);
+    requestAnimationFrame(()=> chop.classList.add('go'));
+    setTimeout(()=> chop.remove(), 10000);
   }
 
-  sealBtn.addEventListener('click', ()=>{
-    sealBtn.classList.remove('press'); void sealBtn.offsetWidth; sealBtn.classList.add('press');
-    const r = sealBtn.getBoundingClientRect();
-    inkBurst(r.left + r.width/2, r.top + r.height/2);
-    dock.classList.contains('open') ? scheduleClose() : openMenu();
+  if (location.search.includes('teststamp')) setTimeout(()=>{ stampAt(innerWidth*0.4, innerHeight*0.5); stampAt(innerWidth*0.62, innerHeight*0.4); }, 400);
+
+  /* ---- draggable seal + press-to-stamp ---- */
+  let drag = null;   // {dx, dy, moved, startX, startY}
+  function dockCenter(){ const r = sealBtn.getBoundingClientRect(); return { x: r.left + r.width/2, y: r.top + r.height/2 }; }
+
+  sealBtn.addEventListener('pointerdown', (e)=>{
+    e.preventDefault();
+    const r = dock.getBoundingClientRect();
+    drag = { dx: e.clientX - r.left, dy: e.clientY - r.top, moved: 0, sx: e.clientX, sy: e.clientY };
+    dock.classList.add('dragging');
+    dock.classList.remove('open');
+    sealBtn.setPointerCapture(e.pointerId);
+  });
+  sealBtn.addEventListener('pointermove', (e)=>{
+    if (!drag) return;
+    drag.moved = Math.max(drag.moved, Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy));
+    if (drag.moved > 3) {
+      // switch dock to left/top positioning and follow the pointer
+      let x = e.clientX - drag.dx, y = e.clientY - drag.dy;
+      const w = dock.offsetWidth, h = dock.offsetHeight;
+      x = Math.max(6, Math.min(window.innerWidth - w - 6, x));
+      y = Math.max(6, Math.min(window.innerHeight - h - 6, y));
+      dock.style.left = x+'px'; dock.style.top = y+'px';
+      dock.style.right = 'auto'; dock.style.bottom = 'auto';
+    }
+  });
+  sealBtn.addEventListener('pointerup', (e)=>{
+    if (!drag) return;
+    dock.classList.remove('dragging');
+    const wasTap = drag.moved <= 4;
+    drag = null;
+    if (wasTap) {
+      // a tap → stamp 胡 at the seal's current spot
+      sealBtn.classList.remove('press'); void sealBtn.offsetWidth; sealBtn.classList.add('press');
+      const c = dockCenter();
+      stampAt(c.x, c.y);
+    }
   });
   document.addEventListener('click', (e)=>{ if(!dock.contains(e.target)) dock.classList.remove('open'); });
 
