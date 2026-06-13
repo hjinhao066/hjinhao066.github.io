@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23b8341f'/%3E%3Ctext x='32' y='46' font-family='serif' font-weight='700' font-size='40' fill='%23f9f4ea' text-anchor='middle'%3E%E8%83%A1%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Jost:wght@400;500&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --paper: #f6f3ec;
@@ -29,12 +29,13 @@
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Fraunces', 'Noto Serif SC', Georgia, serif;
+    font-family: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
     font-optical-sizing: auto;
     background: var(--paper);
     color: var(--ink);
-    line-height: 1.65;
-    font-size: 17px;
+    line-height: 1.6;
+    font-size: 18.5px;
+    font-weight: 500;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -42,7 +43,7 @@
   ::selection { background: var(--seal); color: var(--paper); }
 
   .mono {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Jost', sans-serif;
     font-feature-settings: 'tnum';
   }
 
@@ -59,7 +60,7 @@
   /* ---- language switching ---- */
   html[data-lang="en"] .zh { display: none; }
   html[data-lang="zh"] .en { display: none; }
-  html[data-lang="zh"] body { font-family: 'Noto Serif SC', 'Fraunces', serif; }
+  html[data-lang="zh"] body { font-family: 'Noto Serif SC', 'Cormorant Garamond', serif; }
 
   /* ---- frame ---- */
   .frame {
@@ -99,10 +100,10 @@
     position: relative;
   }
   .masthead h1 {
-    font-size: clamp(52px, 9vw, 104px);
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1.02;
+    font-size: clamp(56px, 9.5vw, 112px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.0;
     max-width: 14ch;
   }
   html[data-lang="zh"] .masthead h1 { font-weight: 600; letter-spacing: .04em; }
@@ -132,8 +133,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Noto Serif SC', serif;
-    font-size: 46px;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+    font-size: 50px;
     font-weight: 700;
     transform: rotate(2.5deg);
     border-radius: 3px;
@@ -688,7 +689,7 @@
       </div>
       <span>SEATTLE 47.6°N, 122.3°W</span>
     </div>
-    <p class="colophon"><span class="en">Set in Fraunces &amp; IBM Plex Mono. No frameworks, no tracking — one HTML file.</span><span class="zh">排版：Fraunces 与 IBM Plex Mono。无框架，无追踪 —— 一个 HTML 文件。</span></p>
+    <p class="colophon"><span class="en">Set in Cormorant Garamond &amp; Jost. No frameworks, no tracking — one HTML file.</span><span class="zh">排版：Cormorant Garamond 与 Jost。无框架，无追踪 —— 一个 HTML 文件。</span></p>
   </footer>
 
 </div>
