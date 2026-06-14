@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jinhao Hu — 胡锦豪</title>
-<meta name="description" content="The personal site of Jinhao Hu (胡锦豪) — data analyst, AI-agent tinkerer, and someone who keeps going outside to collect light.">
-<meta property="og:title" content="Jinhao Hu — 胡锦豪">
+<title>Jinhao Hu · 胡锦豪</title>
+<meta name="description" content="The personal site of Jinhao Hu (胡锦豪): data analyst, AI-agent tinkerer, and someone who keeps going outside to collect light.">
+<meta property="og:title" content="Jinhao Hu · 胡锦豪">
 <meta property="og:description" content="Data analyst by training, builder by instinct. Field notes, things I build, and a red seal that opens doors.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23c5402a'/%3E%3Ctext x='32' y='47' font-family='serif' font-weight='700' font-size='40' fill='%23f4ecda' text-anchor='middle'%3E%E8%83%A1%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>document.documentElement.className = 'js';</script>
 <style>
   :root {
@@ -30,7 +30,8 @@
     --serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
     --sans: 'Jost', 'Noto Serif SC', system-ui, sans-serif;
     --cal: 'Ma Shan Zheng', 'Noto Serif SC', serif;
-    --cursive: 'Zhi Mang Xing', 'Ma Shan Zheng', cursive, serif;
+    --hand: 'Long Cang', 'Ma Shan Zheng', cursive, serif;
+    --cursive: 'Long Cang', 'Ma Shan Zheng', cursive, serif;
     --zh: 'Noto Serif SC', serif;
   }
 
@@ -76,17 +77,22 @@
   /* top bar */
   .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; mix-blend-mode: difference; }
   .topbar .brand { font-family: var(--serif); font-weight: 500; font-size: 20px; letter-spacing: .01em; color: #fff; }
-  html[data-lang="zh"] .topbar .brand { font-family: var(--cal); font-size: 22px; }
+  html[data-lang="zh"] .topbar .brand { font-family: var(--hand); font-size: 24px; }
   .topbar .right { display: flex; gap: 26px; align-items: center; }
   .topbar a, .topbar button { color: #fff; background: none; border: none; cursor: pointer; font-family: var(--sans); font-weight: 400; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; padding: 0; opacity: .82; transition: opacity .2s; }
   .topbar a:hover, .topbar button:hover { opacity: 1; }
 
   /* hero */
-  .hero { position: relative; z-index: 2; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 120px 0 80px; }
+  .hero { position: relative; z-index: 2; min-height: 100svh; display: flex; align-items: center; padding: 120px 0 80px; }
+  .hero-grid { display: grid; grid-template-columns: 1.22fr .78fr; gap: 60px; align-items: center; width: 100%; }
+  .hero-text { display: flex; flex-direction: column; }
   .hero .eyebrow { margin-bottom: 26px; }
+  .hero-photo { position: relative; justify-self: end; max-width: 420px; width: 100%; }
+  .hero-photo img { width: 100%; height: auto; max-height: 80vh; object-fit: cover; display: block; filter: contrast(1.03) saturate(.98); box-shadow: 0 30px 60px rgba(0,0,0,.55); }
+  .hero-photo::after { content: ''; position: absolute; left: -14px; top: -14px; right: 22px; bottom: 22px; border: 1px solid var(--gold); opacity: .35; z-index: -1; pointer-events: none; }
   .hero-stack { display: flex; flex-direction: column; gap: 6px; }
   .name-lat { font-family: var(--serif); font-weight: 500; font-size: clamp(64px, 13vw, 168px); line-height: .92; letter-spacing: -0.01em; color: var(--ivory); }
-  .name-cal { font-family: var(--cal); font-size: clamp(72px, 15vw, 200px); line-height: .9; letter-spacing: .04em; color: var(--ivory); }
+  .name-cal { font-family: var(--hand); font-size: clamp(78px, 16vw, 210px); line-height: .9; letter-spacing: .04em; color: var(--ivory); }
   .name-sub { font-family: var(--sans); font-weight: 300; font-size: clamp(15px, 1.8vw, 21px); letter-spacing: .3em; text-transform: uppercase; color: var(--faint); margin-top: 8px; }
   html[data-lang="zh"] .name-sub { font-family: var(--cal); letter-spacing: .08em; text-transform: none; }
   .hero-tagline { margin-top: 44px; font-family: var(--serif); font-size: clamp(26px, 3.6vw, 50px); font-weight: 400; line-height: 1.28; max-width: 19ch; letter-spacing: 0; }
@@ -115,13 +121,18 @@
   html[data-lang="zh"] .lede em { font-style: normal; color: var(--gold); }
 
   /* about */
-  .about-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 64px; align-items: start; }
-  .about-body { margin-top: 26px; font-size: 16px; color: var(--dim); line-height: 1.8; max-width: 46ch; font-weight: 300; }
-  .vcard { border: 1px solid var(--line); }
-  .vcard .row { display: flex; justify-content: space-between; gap: 16px; padding: 15px 20px; border-bottom: 1px solid var(--line); font-size: 13px; letter-spacing: .02em; }
-  .vcard .row:last-child { border-bottom: none; }
-  .vcard .k { color: var(--faint); text-transform: uppercase; letter-spacing: .12em; font-size: 11px; align-self: center; }
-  .vcard .v { color: var(--ivory); text-align: right; }
+  .about-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 64px; align-items: center; }
+  .about-body { margin-top: 26px; font-size: 16px; color: var(--dim); line-height: 1.8; max-width: 48ch; font-weight: 300; }
+  .vitals-inline { margin-top: 30px; display: grid; grid-template-columns: auto 1fr; gap: 10px 22px; max-width: 44ch; }
+  .vitals-inline .k { color: var(--faint); text-transform: uppercase; letter-spacing: .14em; font-size: 11px; align-self: center; }
+  .vitals-inline .v { color: var(--ivory); font-size: 15px; }
+  .vitals-inline .v.hl { color: var(--gold); }
+  /* animated journey map: China -> Seattle */
+  .journey-wrap { border: 1px solid var(--line); padding: 26px 24px 18px; background: linear-gradient(180deg, rgba(27,23,17,.5), rgba(20,17,12,.2)); }
+  .journey { width: 100%; height: auto; display: block; }
+  .journey-cap { margin-top: 14px; text-align: center; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .journey-cap b { color: var(--gold); font-weight: 500; }
+  .j-label { font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 
   /* building */
   .builds { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
@@ -151,9 +162,22 @@
   .cap .cap-meta { text-align: right; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
   .cap .cap-meta .no { color: var(--seal); }
 
+  /* chapter divider */
+  .chapter { display: flex; align-items: baseline; gap: 22px; margin: 36px 0 4px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .chapter .ch-no { font-family: var(--cal); font-size: 40px; color: var(--seal); line-height: 1; min-width: 1.4ch; }
+  .chapter .ch-no .en { font-family: var(--serif); font-style: italic; font-weight: 500; }
+  .chapter .ch-name { font-family: var(--serif); font-size: clamp(26px, 3.2vw, 42px); font-weight: 500; letter-spacing: -0.01em; }
+  html[data-lang="zh"] .chapter .ch-name { font-family: var(--zh); }
+  .chapter .ch-meta { margin-left: auto; align-self: center; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
+
   /* feat = single full-width image, capped height for portraits */
   .feat .imgwrap { max-height: 86vh; }
   .feat .imgwrap img { max-height: 86vh; object-fit: contain; }
+  /* full-bleed feat spans the viewport for drama (natural ratio, no crop) */
+  .feat.bleed { width: 100vw; margin-left: calc(50% - 50vw); }
+  .feat.bleed .imgwrap { max-height: none; }
+  .feat.bleed .imgwrap img { width: 100%; height: auto; max-height: none; object-fit: fill; }
+  .feat.bleed .cap { max-width: var(--maxw); margin: 16px auto 0; padding: 0 40px; }
   /* duo = two side by side, natural ratio, top aligned */
   .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
   /* note = image + side text */
@@ -193,6 +217,10 @@
   html[data-lang="zh"] .foot-top .big { font-family: var(--zh); font-weight: 300; }
   .foot-top .big a { border-bottom: 2px solid var(--seal); }
   .foot-top .big a:hover { color: var(--seal); }
+  .contact-btn { display: inline-flex; align-items: center; gap: 16px; margin-top: 22px; padding: 18px 34px; background: var(--seal); color: #fff; border-radius: 3px; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; transition: background .25s, transform .25s, box-shadow .25s; box-shadow: 0 10px 26px rgba(155,47,31,.35); }
+  .contact-btn:hover { background: var(--seal-deep); transform: translateY(-2px); box-shadow: 0 16px 34px rgba(155,47,31,.45); }
+  .contact-btn .arr { transition: transform .25s; }
+  .contact-btn:hover .arr { transform: translateX(6px); }
   .foot-links { display: flex; gap: 28px; }
   .foot-links a { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
   .foot-meta { margin-top: 50px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; color: var(--faint); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
@@ -203,13 +231,20 @@
       radial-gradient(120% 120% at 30% 20%, #d24e34 0%, var(--seal) 45%, var(--seal-deep) 100%);
       color: var(--gold); border: none; cursor: grab; font-family: var(--cursive); font-size: 58px; line-height: 1; border-radius: 6px 5px 7px 5px;
       box-shadow: inset 0 0 22px rgba(40,5,0,.55), inset 0 2px 3px rgba(255,180,150,.25), 0 12px 32px rgba(0,0,0,.55); transition: transform .18s cubic-bezier(.34,1.56,.64,1); display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; }
-  .seal-btn::after { content:''; position:absolute; inset:5px; border:1.5px solid rgba(244,236,218,.45); border-radius:4px 3px 5px 3px; }
+  .seal-btn::after { content:''; position:absolute; inset:4px; border:2.5px solid rgba(244,236,218,.6); border-radius:5px 4px 6px 4px;
+      box-shadow: inset 0 0 0 1px rgba(40,5,0,.35), 0 0 0 1px rgba(40,5,0,.4); }
   .seal-btn::before { content:''; position:absolute; inset:0; border-radius:6px 5px 7px 5px; mix-blend-mode:overlay; opacity:.5; pointer-events:none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E"); }
   .seal-dock.dragging .seal-btn { cursor: grabbing; }
   .seal-btn:hover { transform: scale(1.06) rotate(-3deg); }
-  .seal-btn.press { animation: press .5s ease; }
-  @keyframes press { 0%{transform:scale(1)} 22%{transform:scale(.82) rotate(4deg)} 50%{transform:scale(1.1) rotate(-2deg)} 100%{transform:scale(1)} }
+  .seal-btn.press { animation: press .6s cubic-bezier(.3,.8,.3,1); }
+  @keyframes press {
+    0%   { transform: scale(1) translateY(0) rotate(0); }
+    26%  { transform: scale(.66) translateY(7px) rotate(5deg); }
+    42%  { transform: scale(.70) translateY(7px) rotate(5deg); }
+    66%  { transform: scale(1.16) translateY(-3px) rotate(-2deg); }
+    100% { transform: scale(1) translateY(0) rotate(0); }
+  }
   .seal-hint { position: absolute; right: 104px; bottom: 32px; white-space: nowrap; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); transition: opacity .3s; pointer-events: none; }
   .seal-dock.open .seal-hint { opacity: 0; }
 
@@ -246,6 +281,8 @@
     body { font-size: 16px; }
     .wrap { padding: 0 24px; }
     .topbar { padding: 18px 24px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+    .hero-photo { justify-self: start; max-width: 300px; order: 2; }
     .about-grid { grid-template-columns: 1fr; gap: 40px; }
     .builds { grid-template-columns: 1fr; }
     .duo, .note { grid-template-columns: 1fr; gap: 26px; }
@@ -287,21 +324,28 @@
 
   <!-- HERO -->
   <header class="hero">
-    <div class="eyebrow label reveal" data-rise><span class="en">Personal Site · Seattle</span><span class="zh">个人站 · 西雅图</span></div>
-    <div class="hero-stack">
-      <span class="reveal" data-rise>
-        <span class="en name-lat">Jinhao&nbsp;Hu</span>
-        <span class="zh name-cal">胡锦豪</span>
-      </span>
-      <span class="name-sub reveal" data-rise>
-        <span class="en">胡锦豪 · Data &amp; Light</span>
-        <span class="zh">Jinhao Hu · 数据与光</span>
-      </span>
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="eyebrow label reveal" data-rise><span class="en">Personal Site · Seattle</span><span class="zh">个人站 · 西雅图</span></div>
+        <div class="hero-stack">
+          <span class="reveal" data-rise>
+            <span class="en name-lat">Jinhao&nbsp;Hu</span>
+            <span class="zh name-cal">胡锦豪</span>
+          </span>
+          <span class="name-sub reveal" data-rise>
+            <span class="en">胡锦豪 · Data &amp; Light</span>
+            <span class="zh">Jinhao Hu · 数据与光</span>
+          </span>
+        </div>
+        <h1 class="hero-tagline reveal" data-rise>
+          <span class="en">Data analyst by training, builder by instinct. I teach machines the boring parts, then go outside to <em>collect light</em>.</span>
+          <span class="zh">科班出身的数据分析师，骨子里更爱造东西。我把无聊的活儿教给机器，然后出门<em>收集光</em>。</span>
+        </h1>
+      </div>
+      <figure class="hero-photo reveal" data-rise>
+        <img src="img/hero-portrait.jpg" alt="Jinhao Hu before the frozen Franklin Falls">
+      </figure>
     </div>
-    <h1 class="hero-tagline reveal" data-rise>
-      <span class="en">Data analyst by training. Builder by instinct. I teach machines the boring parts, then go outside to <em>collect light</em>.</span>
-      <span class="zh">科班出身的数据分析师，骨子里更爱造东西。我把无聊的活儿教给机器，然后出门<em>收集光</em>。</span>
-    </h1>
     <div class="scrollcue">
       <span class="bar"></span>
       <span><span class="en">Scroll</span><span class="zh">向下</span></span>
@@ -312,26 +356,55 @@
   <section id="about" class="sec-pad">
     <div class="sec-head reveal" data-rise>
       <span class="idx"><span class="zh cal">一</span><span class="en">01</span></span>
-      <h2><span class="en">Who's <em>writing</em></span><span class="zh">这是<em>谁</em></span></h2>
+      <h2><span class="en">Who <em>am I</em></span><span class="zh">我<em>是谁</em></span></h2>
       <span class="rule"></span>
     </div>
     <div class="about-grid">
       <div class="reveal" data-rise>
         <p class="lede">
-          <span class="en">I'm Jinhao — from Zhejiang, China, now a graduate student in Information Management at the <em>University of Washington</em>, Seattle.</span>
+          <span class="en">I'm Jinhao, from Zhejiang in China, now a graduate student in Information Management at the <em>University of Washington</em> in Seattle.</span>
           <span class="zh">我是锦豪，浙江人，现在在<em>华盛顿大学</em>读信息管理硕士，人在西雅图。</span>
         </p>
         <p class="about-body">
-          <span class="en">By day I live in SQL, Python, and dashboards — turning messy operational data into things teams can act on. The rest of the time I'm building small tools to automate my own life, getting a little too obsessed with AI agents, and chasing good light with a camera. This site is the human half. The work half lives on my résumé.</span>
+          <span class="en">By day I live in SQL, Python, and dashboards, turning messy operational data into things teams can act on. The rest of the time I build small tools to automate my own life, get a little too obsessed with AI agents, and chase good light with a camera. This site is the human half. The work half lives on my résumé.</span>
           <span class="zh">白天我泡在 SQL、Python 和各种看板里，把杂乱的业务数据变成团队真正能用的东西。其余时间，我在写一些自动化自己生活的小工具，对 AI agent 有点上头，再背着相机去追光。这个站是「人」的那一半，「工作」的那一半放在简历里。</span>
         </p>
+        <div class="vitals-inline">
+          <span class="k"><span class="en">Based</span><span class="zh">现居</span></span><span class="v"><span class="en">Seattle, WA</span><span class="zh">西雅图</span></span>
+          <span class="k"><span class="en">From</span><span class="zh">来自</span></span><span class="v"><span class="en">Zhejiang, China</span><span class="zh">中国浙江</span></span>
+          <span class="k"><span class="en">Studying</span><span class="zh">在读</span></span><span class="v">MSIM · University of Washington '27</span>
+          <span class="k"><span class="en">Working on</span><span class="zh">方向</span></span><span class="v"><span class="en">Data · BI · AI automation</span><span class="zh">数据 · BI · AI 自动化</span></span>
+          <span class="k"><span class="en">Status</span><span class="zh">状态</span></span><span class="v hl"><span class="en">Open to summer 2026</span><span class="zh">找 2026 暑期实习</span></span>
+        </div>
       </div>
-      <div class="vcard reveal" data-rise>
-        <div class="row"><span class="k"><span class="en">Based</span><span class="zh">现居</span></span><span class="v"><span class="en">Seattle, WA</span><span class="zh">西雅图</span></span></div>
-        <div class="row"><span class="k"><span class="en">From</span><span class="zh">来自</span></span><span class="v"><span class="en">Zhejiang, China</span><span class="zh">中国浙江</span></span></div>
-        <div class="row"><span class="k"><span class="en">Studying</span><span class="zh">在读</span></span><span class="v">MSIM · UW '27</span></div>
-        <div class="row"><span class="k"><span class="en">Working on</span><span class="zh">方向</span></span><span class="v"><span class="en">Data · BI · AI automation</span><span class="zh">数据 · BI · AI 自动化</span></span></div>
-        <div class="row"><span class="k"><span class="en">Status</span><span class="zh">状态</span></span><span class="v" style="color:var(--gold)"><span class="en">Open to summer '26</span><span class="zh">找 2026 暑期实习</span></span></div>
+      <div class="journey-wrap reveal" data-rise>
+        <svg class="journey" viewBox="0 0 400 300" role="img" aria-label="The journey from Zhejiang, China to Seattle">
+          <g stroke="#2d2618" fill="none" stroke-width="1">
+            <ellipse cx="200" cy="150" rx="160" ry="150" opacity=".55"/>
+            <ellipse cx="200" cy="150" rx="160" ry="70" opacity=".4"/>
+            <line x1="40" y1="150" x2="360" y2="150" opacity=".35"/>
+            <line x1="200" y1="6" x2="200" y2="294" opacity=".22"/>
+          </g>
+          <path id="route" d="M78 214 Q200 36 326 104" fill="none" stroke="#cda153" stroke-width="1.7" stroke-dasharray="2 7" stroke-linecap="round" opacity=".9">
+            <animate attributeName="stroke-dashoffset" from="0" to="-90" dur="3.5s" repeatCount="indefinite"/>
+          </path>
+          <g>
+            <circle cx="78" cy="214" r="9" fill="#c5402a" opacity=".22"><animate attributeName="r" values="9;15;9" dur="2.4s" repeatCount="indefinite"/></circle>
+            <circle cx="78" cy="214" r="5" fill="#c5402a"/>
+            <text x="78" y="238" text-anchor="middle" class="j-label" fill="#b1a890"><tspan class="en">Zhejiang</tspan><tspan class="zh">浙江</tspan></text>
+          </g>
+          <g>
+            <circle cx="326" cy="104" r="9" fill="#cda153" opacity=".25"><animate attributeName="r" values="9;16;9" dur="2.4s" begin="1.2s" repeatCount="indefinite"/></circle>
+            <circle cx="326" cy="104" r="5" fill="#efe7d5"/>
+            <text x="326" y="88" text-anchor="middle" class="j-label" fill="#efe7d5"><tspan class="en">Seattle</tspan><tspan class="zh">西雅图</tspan></text>
+          </g>
+          <g fill="#cda153">
+            <path d="M-9,0 L9,-4 L4,0 L9,4 Z">
+              <animateMotion dur="4.5s" repeatCount="indefinite" rotate="auto" path="M78 214 Q200 36 326 104"/>
+            </path>
+          </g>
+        </svg>
+        <div class="journey-cap"><span class="en">6,500 miles · <b>Hangzhou → Seattle</b></span><span class="zh">一万公里 · <b>杭州 → 西雅图</b></span></div>
       </div>
     </div>
   </section>
@@ -344,24 +417,24 @@
       <span class="rule"></span>
     </div>
     <p class="lede reveal" data-rise style="max-width:34ch; margin-bottom:48px;">
-      <span class="en">I'm a little obsessed with AI agents. I build tools for an audience of one — me — and open-source the ones that survive.</span>
-      <span class="zh">我对 AI agent 有点着迷。我做的工具往往只有一个用户——我自己——其中活下来的，就开源出去。</span>
+      <span class="en">I'm a little obsessed with AI agents. I build tools for an audience of one, myself, and open-source the ones that survive.</span>
+      <span class="zh">我对 AI agent 有点着迷。我做的工具往往只有一个用户，就是我自己，其中活下来的，就开源出去。</span>
     </p>
     <div class="builds reveal" data-rise>
       <div class="build">
         <div class="top"><h3>idlebell</h3><span class="tag live"><span class="en">Open Source</span><span class="zh">开源</span></span></div>
-        <p><span class="en">A tiny daemon that rings when your AI coding agents go idle — so you can run a fleet of them without babysitting terminals.</span><span class="zh">一个小守护进程：当你的 AI 编程 agent 闲下来时响铃，于是你能同时跑一群 agent，而不用一直盯着终端。</span></p>
+        <p><span class="en">A tiny daemon that rings when your AI coding agents go idle, so you can run a fleet of them without babysitting terminals.</span><span class="zh">一个小守护进程：当你的 AI 编程 agent 闲下来时响铃，于是你能同时跑一群 agent，而不用一直盯着终端。</span></p>
         <div class="stack">macOS · Windows · Shell · launchd</div>
         <a class="go" href="https://github.com/hjinhao066/idlebell" target="_blank" rel="noopener">github.com/hjinhao066/idlebell ↗</a>
       </div>
       <div class="build">
         <div class="top"><h3>Hermes</h3><span class="tag"><span class="en">Personal</span><span class="zh">自用</span></span></div>
-        <p><span class="en">My private "life OS" — a 24/7 hub that reads my feeds, files my newsletters, and ships me a morning briefing before I'm awake.</span><span class="zh">我的私人「生活操作系统」——一个 7×24 的中枢，替我读资讯、归类邮件，在我醒来前把当天的晨报送到。</span></p>
+        <p><span class="en">My private "life OS," a 24/7 hub that reads my feeds, files my newsletters, and ships me a morning briefing before I'm awake.</span><span class="zh">我的私人「生活操作系统」：一个 7×24 的中枢，替我读资讯、归类邮件，在我醒来前把当天的晨报送到。</span></p>
         <div class="stack">RSS · Agents · Telegram · Cron</div>
       </div>
       <div class="build">
         <div class="top"><h3>X&nbsp;Deck</h3><span class="tag live"><span class="en">Open Source · 10★</span><span class="zh">开源 · 10★</span></span></div>
-        <p><span class="en">A DIY multi-column deck for X (Twitter) — a TweetDeck / X&nbsp;Pro alternative for Mac &amp; Windows. Picked up stars and a small following on X.</span><span class="zh">一个 DIY 多列 X（推特）面板——给 Mac 和 Windows 的 TweetDeck / X&nbsp;Pro 替代品。在推特上收获了 star 和一些关注。</span></p>
+        <p><span class="en">A DIY multi-column deck for X (Twitter): a TweetDeck / X&nbsp;Pro alternative for Mac &amp; Windows. Picked up stars and a small following on X.</span><span class="zh">一个 DIY 多列 X（推特）面板，给 Mac 和 Windows 的 TweetDeck / X&nbsp;Pro 替代品。在推特上收获了 star 和一些关注。</span></p>
         <div class="stack">Electron · Multi-column · Win + Mac</div>
         <a class="go" href="https://github.com/hjinhao066/xdeck-diy" target="_blank" rel="noopener">github.com/hjinhao066/xdeck-diy ↗</a>
       </div>
@@ -388,7 +461,8 @@
 
     <div class="gallery">
 
-      <!-- 01 note R: Joffre arms -->
+      <div class="chapter reveal" data-rise><span class="ch-no"><span class="zh cal">一</span><span class="en">I</span></span><span class="ch-name"><span class="en">Pacific Northwest</span><span class="zh">太平洋西北</span></span><span class="ch-meta">2024 → 2026</span></div>
+
       <figure class="note right reveal" data-rise>
         <div class="imgwrap"><img src="img/joffre-arms.jpg" alt="Arms wide on a log over a turquoise glacier lake"></div>
         <div class="side">
@@ -398,96 +472,81 @@
         </div>
       </figure>
 
-      <!-- 02-03 duo -->
       <div class="duo reveal" data-rise>
         <figure><div class="imgwrap"><img src="img/joffre-profile.jpg" alt="Profile against a turquoise lake"></div><div class="cap"><span class="cap-name"><span class="zh">湖</span><span class="en">Joffre Lakes</span></span><span class="cap-meta"><span class="no">№ 02</span> · BC</span></div></figure>
         <figure><div class="imgwrap"><img src="img/smith-rock.jpg" alt="Sitting on a cliff edge at Smith Rock"></div><div class="cap"><span class="cap-name"><span class="zh">崖</span><span class="en">Smith Rock</span></span><span class="cap-meta"><span class="no">№ 03</span> · OREGON</span></div></figure>
       </div>
 
-      <!-- 04 note L: Franklin Falls -->
-      <figure class="note reveal" data-rise>
-        <div class="imgwrap"><img src="img/franklin-falls.jpg" alt="Arms open before a frozen waterfall"></div>
-        <div class="side">
-          <div class="big"><span class="zh cal">冰瀑</span><span class="en">Frozen</span></div>
-          <div class="txt"><span class="en">A waterfall caught mid-freeze. Stand close enough and the cold has a sound.</span><span class="zh">一条被冻在半空的瀑布。站得够近，连寒冷都有声音。</span></div>
-          <div class="meta"><span class="no">№ 04</span> · <span class="en">FRANKLIN FALLS, WA · FEB 2026</span><span class="zh">富兰克林瀑布 · 2026.02</span></div>
-        </div>
-      </figure>
-
-      <!-- 05 feat: Seattle skyline -->
-      <figure class="feat reveal" data-rise>
+      <figure class="feat bleed reveal" data-rise>
         <div class="imgwrap"><img src="img/seattle-skyline.jpg" alt="Seattle skyline and the Space Needle at golden hour"></div>
-        <div class="cap"><span class="cap-name"><span class="zh">西雅图</span><span class="en">Seattle</span></span><span class="cap-meta"><span class="no">№ 05</span> · <span class="en">KERRY PARK, SEATTLE · MAY 2026</span><span class="zh">凯里公园，西雅图 · 2026.05</span></span></div>
+        <div class="cap"><span class="cap-name"><span class="zh">西雅图</span><span class="en">Seattle</span></span><span class="cap-meta"><span class="no">№ 04</span> · <span class="en">KERRY PARK, SEATTLE · MAY 2026</span><span class="zh">凯里公园，西雅图 · 2026.05</span></span></div>
       </figure>
 
-      <div class="interlude reveal" data-rise>
-        <p class="q"><span class="mark">「</span><span class="en">The best datasets and the best views share one thing: you have to hike to them.</span><span class="zh">最好的数据和最好的风景有个共同点——都得自己走过去。</span><span class="mark">」</span></p>
+      <div class="duo reveal" data-rise>
+        <figure><div class="imgwrap"><img src="img/crater-lake.jpg" alt="Sitting by the deep blue Crater Lake"></div><div class="cap"><span class="cap-name"><span class="zh">深湖</span><span class="en">Crater Lake</span></span><span class="cap-meta"><span class="no">№ 05</span> · OREGON</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/joffre-rock.jpg" alt="Sitting on a boulder by a glacier lake"></div><div class="cap"><span class="cap-name"><span class="zh">石</span><span class="en">Joffre Lakes</span></span><span class="cap-meta"><span class="no">№ 06</span> · BC</span></div></figure>
       </div>
 
-      <!-- 06 note R: Erhai trees -->
+      <div class="duo reveal" data-rise>
+        <figure><div class="imgwrap"><img src="img/moon.jpg" alt="Silhouette with arms open against a giant moon"></div><div class="cap"><span class="cap-name"><span class="zh">月</span><span class="en">The Moon</span></span><span class="cap-meta"><span class="no">№ 07</span> · A BORROWED MOON</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/aurora.jpg" alt="Aurora over a dark treeline"></div><div class="cap"><span class="cap-name"><span class="zh">极光</span><span class="en">Aurora</span></span><span class="cap-meta"><span class="no">№ 08</span> · PNW</span></div></figure>
+      </div>
+
+      <div class="interlude reveal" data-rise>
+        <p class="q"><span class="mark">「</span><span class="en">The best datasets and the best views share one thing: you have to hike to them.</span><span class="zh">最好的数据和最好的风景有个共同点：都得自己走过去。</span><span class="mark">」</span></p>
+      </div>
+
+      <div class="chapter reveal" data-rise><span class="ch-no"><span class="zh cal">二</span><span class="en">II</span></span><span class="ch-name"><span class="en">Dali, Yunnan</span><span class="zh">云南大理</span></span><span class="ch-meta">2023</span></div>
+
       <figure class="note right reveal" data-rise>
         <div class="imgwrap"><img src="img/erhai-trees.jpg" alt="By the dawn-redwood water trees of Erhai Lake"></div>
         <div class="side">
           <div class="big"><span class="zh cal">洱海</span><span class="en">Erhai</span></div>
-          <div class="txt"><span class="en">Dali, where the lake is so wide it borrows the whole sky — and trees grow straight out of the water.</span><span class="zh">大理。湖面宽到把整片天空都借走，连树都从水里长出来。</span></div>
-          <div class="meta"><span class="no">№ 06</span> · <span class="en">ERHAI LAKE, DALI · JUN 2023</span><span class="zh">洱海，大理 · 2023.06</span></div>
+          <div class="txt"><span class="en">Dali, where the lake is so wide it borrows the whole sky, and trees grow straight out of the water.</span><span class="zh">大理。湖面宽到把整片天空都借走，连树都从水里长出来。</span></div>
+          <div class="meta"><span class="no">№ 09</span> · <span class="en">ERHAI LAKE, DALI · JUN 2023</span><span class="zh">洱海，大理 · 2023.06</span></div>
         </div>
       </figure>
 
-      <!-- 07-08 duo -->
       <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/erhai-profile.jpg" alt="Sitting by Erhai Lake looking out"></div><div class="cap"><span class="cap-name"><span class="zh">岸</span><span class="en">Erhai Lake</span></span><span class="cap-meta"><span class="no">№ 07</span> · DALI</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/dali-cangshan.jpg" alt="Farmland under the Cangshan range"></div><div class="cap"><span class="cap-name"><span class="zh">苍山</span><span class="en">Cangshan</span></span><span class="cap-meta"><span class="no">№ 08</span> · DALI</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/erhai-profile.jpg" alt="Sitting by Erhai Lake looking out"></div><div class="cap"><span class="cap-name"><span class="zh">岸</span><span class="en">Erhai Lake</span></span><span class="cap-meta"><span class="no">№ 10</span> · DALI</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/dali-cangshan.jpg" alt="Farmland under the Cangshan range"></div><div class="cap"><span class="cap-name"><span class="zh">苍山</span><span class="en">Cangshan</span></span><span class="cap-meta"><span class="no">№ 11</span> · DALI</span></div></figure>
       </div>
 
-      <!-- 09-10 duo: Zhangye + Desert, both portrait, side by side -->
+      <div class="chapter reveal" data-rise><span class="ch-no"><span class="zh cal">三</span><span class="en">III</span></span><span class="ch-name"><span class="en">The Northwest of China</span><span class="zh">中国西北</span></span><span class="ch-meta">2025</span></div>
+
       <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/zhangye.jpg" alt="Above the rainbow mountains of Zhangye Danxia"></div><div class="cap"><span class="cap-name"><span class="zh">张掖</span><span class="en">Zhangye Danxia</span></span><span class="cap-meta"><span class="no">№ 09</span> · GANSU</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/desert-stand.jpg" alt="Standing on a dune in the Tengger Desert"></div><div class="cap"><span class="cap-name"><span class="zh">腾格里</span><span class="en">Tengger Desert</span></span><span class="cap-meta"><span class="no">№ 10</span> · INNER MONGOLIA</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/zhangye.jpg" alt="Above the rainbow mountains of Zhangye Danxia"></div><div class="cap"><span class="cap-name"><span class="zh">张掖</span><span class="en">Zhangye Danxia</span></span><span class="cap-meta"><span class="no">№ 12</span> · GANSU</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/desert-stand.jpg" alt="Standing on a dune in the Tengger Desert"></div><div class="cap"><span class="cap-name"><span class="zh">腾格里</span><span class="en">Tengger Desert</span></span><span class="cap-meta"><span class="no">№ 13</span> · INNER MONGOLIA</span></div></figure>
       </div>
 
-      <!-- 11-12 duo camels -->
       <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/camel-snow.jpg" alt="A camel walking with snow mountains behind"></div><div class="cap"><span class="cap-name"><span class="zh">驼</span><span class="en">Bactrian</span></span><span class="cap-meta"><span class="no">№ 11</span> · TENGGER</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/camel-face.jpg" alt="A Bactrian camel facing the camera"></div><div class="cap"><span class="cap-name"><span class="zh">驼</span><span class="en">Bactrian</span></span><span class="cap-meta"><span class="no">№ 12</span> · TENGGER</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/camel-snow.jpg" alt="A camel walking with snow mountains behind"></div><div class="cap"><span class="cap-name"><span class="zh">驼</span><span class="en">Bactrian</span></span><span class="cap-meta"><span class="no">№ 14</span> · TENGGER</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/camel-face.jpg" alt="A Bactrian camel facing the camera"></div><div class="cap"><span class="cap-name"><span class="zh">驼</span><span class="en">Bactrian</span></span><span class="cap-meta"><span class="no">№ 15</span> · TENGGER</span></div></figure>
       </div>
 
-      <!-- 13 note L: Western Xia -->
       <figure class="note reveal" data-rise>
         <div class="imgwrap"><img src="img/xixia-tombs.jpg" alt="The Western Xia imperial tombs against mountains"></div>
         <div class="side">
           <div class="big"><span class="zh cal">西夏</span><span class="en">Western Xia</span></div>
           <div class="txt"><span class="en">A thousand years of earth pyramids, still standing in Ningxia.</span><span class="zh">一千年的夯土金字塔，至今立在宁夏的旷野里。</span></div>
-          <div class="meta"><span class="no">№ 13</span> · <span class="en">WESTERN XIA TOMBS, NINGXIA · FEB 2025</span><span class="zh">西夏王陵，宁夏 · 2025.02</span></div>
+          <div class="meta"><span class="no">№ 16</span> · <span class="en">WESTERN XIA TOMBS, NINGXIA · FEB 2025</span><span class="zh">西夏王陵，宁夏 · 2025.02</span></div>
         </div>
       </figure>
 
       <div class="interlude reveal" data-rise>
-        <p class="q"><span class="mark">「</span><span class="en">From a glacier lake to a desert in the same year — I just like being where the air changes.</span><span class="zh">同一年里，从冰川湖走到沙漠——我大概只是喜欢待在空气会变的地方。</span><span class="mark">」</span></p>
+        <p class="q"><span class="mark">「</span><span class="en">From a glacier lake to a desert in the same year. I just like being where the air changes.</span><span class="zh">同一年里，从冰川湖走到沙漠，我大概只是喜欢待在空气会变的地方。</span><span class="mark">」</span></p>
       </div>
 
-      <!-- 14-15 duo cities -->
+      <div class="chapter reveal" data-rise><span class="ch-no"><span class="zh cal">四</span><span class="en">IV</span></span><span class="ch-name"><span class="en">Cities &amp; Nights</span><span class="zh">城市与夜</span></span><span class="ch-meta">2024 → 2026</span></div>
+
       <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/shanghai.jpg" alt="Night portrait under the towers of Lujiazui"></div><div class="cap"><span class="cap-name"><span class="zh">沪</span><span class="en">Shanghai</span></span><span class="cap-meta"><span class="no">№ 14</span> · LUJIAZUI</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/hongkong.jpg" alt="Portrait against Victoria Harbour"></div><div class="cap"><span class="cap-name"><span class="zh">港</span><span class="en">Hong Kong</span></span><span class="cap-meta"><span class="no">№ 15</span> · VICTORIA HARBOUR</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/shanghai.jpg" alt="Night portrait under the towers of Lujiazui"></div><div class="cap"><span class="cap-name"><span class="zh">沪</span><span class="en">Shanghai</span></span><span class="cap-meta"><span class="no">№ 17</span> · LUJIAZUI</span></div></figure>
+        <figure><div class="imgwrap"><img src="img/hongkong.jpg" alt="Portrait against Victoria Harbour"></div><div class="cap"><span class="cap-name"><span class="zh">港</span><span class="en">Hong Kong</span></span><span class="cap-meta"><span class="no">№ 18</span> · VICTORIA HARBOUR</span></div></figure>
       </div>
 
-      <!-- 16 feat: NYC -->
-      <figure class="feat reveal" data-rise>
+      <figure class="feat bleed reveal" data-rise>
         <div class="imgwrap"><img src="img/nyc-night.jpg" alt="Night portrait above the Manhattan skyline"></div>
-        <div class="cap"><span class="cap-name"><span class="zh">纽约</span><span class="en">New York</span></span><span class="cap-meta"><span class="no">№ 16</span> · <span class="en">TOP OF THE ROCK, NYC · MAR 2026</span><span class="zh">洛克菲勒之巅，纽约 · 2026.03</span></span></div>
-      </figure>
-
-      <!-- 17-18 duo sky -->
-      <div class="duo reveal" data-rise>
-        <figure><div class="imgwrap"><img src="img/moon.jpg" alt="Silhouette with arms open against a giant moon"></div><div class="cap"><span class="cap-name"><span class="zh">月</span><span class="en">The Moon</span></span><span class="cap-meta"><span class="no">№ 17</span> · A BORROWED MOON</span></div></figure>
-        <figure><div class="imgwrap"><img src="img/aurora.jpg" alt="Aurora over a dark treeline"></div><div class="cap"><span class="cap-name"><span class="zh">极光</span><span class="en">Aurora</span></span><span class="cap-meta"><span class="no">№ 18</span> · PACIFIC NORTHWEST</span></div></figure>
-      </div>
-
-      <!-- 19 feat: Joffre rock, closer -->
-      <figure class="feat reveal" data-rise>
-        <div class="imgwrap"><img src="img/joffre-rock.jpg" alt="Sitting on a boulder by a glacier lake"></div>
-        <div class="cap"><span class="cap-name"><span class="zh">乔佛里</span><span class="en">Back at Joffre</span></span><span class="cap-meta"><span class="no">№ 19</span> · <span class="en">JOFFRE LAKES, BC · AUG 2024</span><span class="zh">乔佛里湖，BC · 2024.08</span></span></div>
+        <div class="cap"><span class="cap-name"><span class="zh">纽约</span><span class="en">New York</span></span><span class="cap-meta"><span class="no">№ 19</span> · <span class="en">TOP OF THE ROCK, NYC · MAR 2026</span><span class="zh">洛克菲勒之巅，纽约 · 2026.03</span></span></div>
       </figure>
 
     </div>
@@ -507,7 +566,10 @@
   <footer id="contact">
     <div class="wrap">
       <div class="foot-top">
-        <p class="big reveal" data-rise><span class="en">Building something, hiring, or just want to talk light and data? <a href="mailto:hjinhao066@gmail.com">Write to me.</a></span><span class="zh">在做什么项目、在招人，或者只想聊聊光和数据？<a href="mailto:hjinhao066@gmail.com">给我写信。</a></span></p>
+        <div class="reveal" data-rise>
+          <p class="big"><span class="en">Wanna talk?</span><span class="zh">想聊聊？</span></p>
+          <a class="contact-btn" href="mailto:hjinhao066@gmail.com?subject=Hi%20Jinhao"><span><span class="en">Email me</span><span class="zh">给我发邮件</span></span><span class="arr">→</span></a>
+        </div>
         <div class="foot-links reveal" data-rise>
           <a class="u" href="mailto:hjinhao066@gmail.com">Email</a>
           <a class="u" href="https://github.com/hjinhao066" target="_blank" rel="noopener">GitHub</a>
@@ -532,7 +594,7 @@
     <a class="seal-item i4" href="resume/"><span>CV</span></a>
     <a class="seal-item i5" href="#contact"><span>@</span></a>
   </div>
-  <button class="seal-btn" id="sealBtn" aria-label="Personal seal — menu">胡</button>
+  <button class="seal-btn" id="sealBtn" aria-label="Personal seal, press to stamp">胡</button>
 </div>
 <div class="ink-layer" id="inkLayer"></div>
 
