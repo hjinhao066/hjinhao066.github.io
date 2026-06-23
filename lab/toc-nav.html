@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh" data-lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab · TOC 阅读目录 / 滚动进度导航</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root{
+    --ink:#14110c; --ink-2:#1b1711; --ink-3:#221d15;
+    --ivory:#efe7d5; --dim:#b1a890; --faint:#7c7260; --line:#2d2618;
+    --seal:#c5402a; --seal-deep:#9b2f1f; --gold:#cda153;
+    --serif:'Cormorant Garamond','Noto Serif SC',Georgia,serif;
+    --sans:'Jost','Noto Serif SC',system-ui,sans-serif;
+    --cal:'Ma Shan Zheng','Noto Serif SC',serif;
+    --hand:'Long Cang','Ma Shan Zheng',cursive,serif;
+    --zh:'Noto Serif SC',serif;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--ink);color:var(--ivory);line-height:1.65;font-size:17px;font-weight:300;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+  ::selection{background:var(--seal);color:var(--ivory)}
+  a{color:inherit;text-decoration:none}
+
+  /* paper grain + vignette to echo main site */
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.045;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 90% at 50% 28%,transparent 55%,rgba(0,0,0,.45) 100%)}
+
+  .label{font-family:var(--sans);font-weight:500;text-transform:uppercase;letter-spacing:.26em;font-size:11px;color:var(--faint)}
+
+  /* ---- lab chrome ---- */
+  .labbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content:space-between;align-items:center;padding:18px 34px;background:linear-gradient(to bottom,rgba(20,17,12,.92),rgba(20,17,12,0));backdrop-filter:blur(2px)}
+  .labbar a.back{font-family:var(--sans);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:9px;transition:color .25s}
+  .labbar a.back:hover{color:var(--seal)}
+  .labbar a.back .arr{display:inline-block;width:22px;height:1px;background:currentColor;position:relative}
+  .labbar a.back .arr::before{content:'';position:absolute;left:0;top:-3px;width:7px;height:7px;border-left:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg)}
+  .labbar .dim-title{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--faint)}
+
+  .lab-hero{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:128px 40px 30px}
+  .lab-hero .seal{display:inline-block;background:var(--seal);color:var(--ivory);font-family:var(--cal);font-size:24px;width:46px;height:46px;line-height:46px;text-align:center;border-radius:5px;margin-bottom:24px}
+  .lab-hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(38px,6vw,72px);line-height:1.02;letter-spacing:-.01em}
+  .lab-hero h1 .zh{font-family:var(--zh);font-weight:500;display:block;font-size:.5em;color:var(--dim);margin-top:10px;letter-spacing:.02em}
+  .lab-hero p{max-width:60ch;margin-top:22px;color:var(--dim);font-size:16px;line-height:1.7}
+
+  /* ---- variant frames ---- */
+  .variant{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:64px 40px 0}
+  .v-head{display:flex;align-items:baseline;gap:18px;margin-bottom:8px;border-top:1px solid var(--line);padding-top:24px}
+  .v-tag{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--seal);letter-spacing:.04em;white-space:nowrap}
+  .v-name{font-family:var(--serif);font-size:clamp(22px,3vw,32px);font-weight:500}
+  .v-meta{margin:6px 0 0;color:var(--faint);font-size:13.5px;max-width:72ch;line-height:1.6}
+  .v-meta b{color:var(--gold);font-weight:400}
+  .v-src{font-family:var(--sans);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+
+  /* each demo is a self-contained scroll stage so variants never interfere */
+  .stage{position:relative;margin-top:30px;height:62vh;min-height:440px;overflow-y:auto;overflow-x:hidden;
+    background:var(--ink-2);border:1px solid var(--line);border-radius:3px;
+    scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  .stage::-webkit-scrollbar{width:7px}
+  .stage::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  .stage::-webkit-scrollbar-track{background:transparent}
+
+  .doc{padding:54px 56px 54px 56px}
+  .doc.with-rail{padding-left:0}
+  .chap{padding:30px 0 64px;border-bottom:1px solid rgba(45,38,24,.5)}
+  .chap:last-child{border-bottom:none;min-height:60%}
+  .chap .knum{font-family:var(--cal);color:var(--seal);font-size:22px;line-height:1}
+  .chap h3{font-family:var(--serif);font-size:30px;font-weight:500;margin:8px 0 14px;letter-spacing:-.01em}
+  .chap p{color:var(--dim);font-size:15px;line-height:1.78;max-width:54ch;margin-bottom:13px}
+  .chap p:first-of-type::first-letter{}
+
+  /* =========================================================
+     VARIANT A — minimal dot rail (老王最终选的极简圆球)
+     灵感: active.theory side index
+  ========================================================= */
+  .vA .stage{display:grid;grid-template-columns:1fr}
+  .railA{position:sticky;top:0;float:left;width:0;height:0;z-index:5}
+  .vA .doc{padding-left:118px}
+  .dotnavA{position:sticky;top:0;height:62vh;min-height:440px;float:left;width:118px;margin-left:0;
+    display:flex;flex-direction:column;justify-content:center;gap:24px;padding-left:42px;z-index:5;
+    pointer-events:none}
+  .dotnavA .dn-item{display:flex;align-items:center;gap:14px;pointer-events:auto;cursor:pointer;height:14px}
+  .dotnavA .dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--faint);background:transparent;
+    transition:all .5s var(--ease);flex:none}
+  .dotnavA .dn-label{font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
+    opacity:0;transform:translateX(-6px);transition:all .45s var(--ease);white-space:nowrap}
+  .dotnavA .dn-item:hover .dn-label{opacity:.7;transform:none}
+  .dotnavA .dn-item.active .dot{background:var(--seal);border-color:var(--seal);box-shadow:0 0 0 5px rgba(197,64,42,.14);transform:scale(1.15)}
+  .dotnavA .dn-item.active .dn-label{opacity:1;transform:none;color:var(--ivory)}
+
+  /* =========================================================
+     VARIANT B — vertical tick / ruler with traveling fill
+     灵感: 获奖长文阅读页的侧边刻度尺
+  ========================================================= */
+  .railB{position:sticky;top:0;float:left;width:96px;height:62vh;min-height:440px;z-index:5;pointer-events:none}
+  .vB .doc{padding-left:128px}
+  .rulerB{position:absolute;left:44px;top:0;bottom:0;width:60px}
+  .rulerB .spine{position:absolute;left:0;top:8%;bottom:8%;width:1px;background:var(--line)}
+  .rulerB .spine-fill{position:absolute;left:0;top:8%;width:1px;background:var(--seal);height:0;transition:height .12s linear;box-shadow:0 0 8px rgba(197,64,42,.5)}
+  .rulerB .tick{position:absolute;left:-7px;width:15px;height:1px;background:var(--faint);cursor:pointer;pointer-events:auto;transition:all .45s var(--ease)}
+  .rulerB .tick .tlabel{position:absolute;left:24px;top:50%;transform:translateY(-50%);font-family:var(--sans);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);white-space:nowrap;opacity:0;transition:opacity .4s,color .4s}
+  .rulerB .tick:hover .tlabel{opacity:.7}
+  .rulerB .tick.active{width:26px;left:-7px;background:var(--seal);height:2px}
+  .rulerB .tick.active .tlabel{opacity:1;color:var(--ivory)}
+  .rulerB .pct{position:absolute;left:0;bottom:-2px;font-family:var(--serif);font-style:italic;font-size:13px;color:var(--gold);transform:translateY(100%)}
+
+  /* =========================================================
+     VARIANT C — numbered index list, reading-progress bleed
+     灵感: editorial long-read 左侧编号目录 + 当前项进度条
+  ========================================================= */
+  .railC{position:sticky;top:0;float:left;width:230px;height:62vh;min-height:440px;z-index:5}
+  .vC .doc{padding-left:262px}
+  .tocC{position:absolute;top:50%;transform:translateY(-50%);left:42px;right:8px;display:flex;flex-direction:column;gap:2px}
+  .tocC .tc-item{position:relative;cursor:pointer;padding:9px 0 9px 0;display:flex;gap:13px;align-items:baseline;overflow:hidden}
+  .tocC .tc-num{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--faint);min-width:2ch;transition:color .4s}
+  .tocC .tc-txt{font-family:var(--sans);font-size:12.5px;letter-spacing:.04em;color:var(--faint);transition:color .4s,transform .5s var(--ease);transform-origin:left}
+  .tocC .tc-item::before{content:'';position:absolute;left:0;bottom:0;height:1px;width:100%;background:var(--line)}
+  .tocC .tc-bar{position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--seal);transition:width .12s linear}
+  .tocC .tc-item.active .tc-num{color:var(--seal)}
+  .tocC .tc-item.active .tc-txt{color:var(--ivory);transform:translateX(4px)}
+  .tocC .tc-item.done .tc-num{color:var(--dim)}
+  .tocC .tc-item.done .tc-txt{color:var(--dim)}
+
+  /* =========================================================
+     VARIANT D — slim top hairline progress + chapter notches
+     灵感: 顶部细横条 + 锯齿章节标记 (long-read header)
+  ========================================================= */
+  .vD .stage{overflow:visible}
+  .topwrapD{position:sticky;top:0;z-index:6;background:var(--ink-2);padding:14px 56px 12px;border-bottom:1px solid rgba(45,38,24,.5)}
+  .topwrapD .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+  .topwrapD .cur{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ivory);transition:opacity .3s}
+  .topwrapD .pct{font-family:var(--sans);font-size:11px;letter-spacing:.18em;color:var(--gold)}
+  .trackD{position:relative;height:2px;background:var(--line)}
+  .trackD .fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--seal);transition:width .1s linear}
+  .trackD .notch{position:absolute;top:-3px;width:1px;height:8px;background:var(--faint);transform:translateX(-50%);cursor:pointer;transition:background .4s,height .4s}
+  .trackD .notch.active{background:var(--gold);height:11px;top:-4px}
+  .vD .stage-inner{height:62vh;min-height:440px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  .vD .stage-inner::-webkit-scrollbar{width:7px}
+  .vD .stage-inner::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+
+  /* =========================================================
+     VARIANT E — radial seal dial (percentage as a stamp)
+     灵感: circular reading-progress dial, 印章化
+  ========================================================= */
+  .railE{position:sticky;top:0;float:left;width:150px;height:62vh;min-height:440px;z-index:5}
+  .vE .doc{padding-left:178px}
+  .dialE{position:absolute;left:38px;top:50%;transform:translateY(-50%);width:92px;text-align:center}
+  .dialE svg{width:92px;height:92px;transform:rotate(-90deg)}
+  .dialE .ring-bg{fill:none;stroke:var(--line);stroke-width:2}
+  .dialE .ring-fg{fill:none;stroke:var(--seal);stroke-width:2.4;stroke-linecap:round;transition:stroke-dashoffset .12s linear}
+  .dialE .dial-num{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ivory)}
+  .dialE .dial-num small{font-size:11px;color:var(--gold);font-style:normal}
+  .dotsE{position:absolute;left:0;right:0;top:calc(50% + 70px);display:flex;justify-content:center;gap:10px}
+  .dotsE .pip{width:6px;height:6px;border-radius:50%;background:var(--line);cursor:pointer;transition:all .4s var(--ease)}
+  .dotsE .pip.active{background:var(--seal);transform:scale(1.4)}
+  .dotsE .pip.done{background:var(--faint)}
+  .dialE .dial-cap{margin-top:14px;font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+
+  .footnote{position:relative;z-index:2;max-width:1180px;margin:90px auto 70px;padding:0 40px;color:var(--faint);font-size:12.5px;letter-spacing:.04em}
+  .footnote span{color:var(--seal)}
+
+  @media(max-width:760px){
+    .vA .doc,.vB .doc,.vC .doc,.vE .doc{padding-left:40px}
+    .dotnavA,.railB,.railC,.railE{display:none}
+    .topwrapD{padding:14px 24px}
+    .doc{padding:40px 24px}
+  }
+
+  /* reduced-motion: kill transitions, keep state readable */
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div class="labbar">
+  <a class="back" href="./index.html"><span class="arr"></span>返回 LAB</a>
+  <span class="dim-title">TOC / 滚动进度导航</span>
+</div>
+
+<header class="lab-hero">
+  <span class="seal">胡</span>
+  <h1>阅读目录与滚动进度
+    <span class="zh">Scroll-spy · Reading Progress · Chapter Index</span>
+  </h1>
+  <p>同一篇长文，五种「读到哪、亮到哪」的侧栏与进度手感。每个变体都是独立可滚动的活 demo（在各自的框里上下滚），scroll-spy 实时高亮当前章节。直觉单选即可，选中段落与主站同一套墨/印章系统，可直接拼接。</p>
+</header>
+
+<!-- ============================================================
+     VARIANT A : 极简圆球目录 (DOT RAIL)
+============================================================ -->
+<section class="variant vA">
+  <div class="v-head">
+    <span class="v-tag">VARIANT A</span>
+    <span class="v-name">极简圆球 · Dot Rail</span>
+  </div>
+  <p class="v-meta">最克制的方案：左侧一列小圆球，读到哪个章节哪颗亮成印章红并晕开光圈，hover 才浮出章节名。<b>老王最终选的就是这种。</b> · <span class="v-src">灵感 active.theory</span></p>
+  <div class="stage" data-stage="A">
+    <div class="dotnavA" aria-label="章节导航">
+      <div class="dn-item" data-go="0"><span class="dot"></span><span class="dn-label">缘起</span></div>
+      <div class="dn-item" data-go="1"><span class="dot"></span><span class="dn-label">取径</span></div>
+      <div class="dn-item" data-go="2"><span class="dot"></span><span class="dn-label">器物</span></div>
+      <div class="dn-item" data-go="3"><span class="dot"></span><span class="dn-label">余响</span></div>
+    </div>
+    <div class="doc with-rail">
+      <article class="chap"><span class="knum">壹</span><h3>缘起</h3><p>所有清楚的目录，都是从一团模糊开始的。最初我只是想知道：当一个人往下滚动一篇很长的文章，他到底需要什么样的陪伴。</p><p>不是装饰，是定位。是一种「我在哪、还有多远」的安心感，像走夜路时墙上那盏不亮但确实存在的灯。</p><p>于是有了这页 Lab：把同一篇文，交给五种不同性格的向导。</p></article>
+      <article class="chap"><span class="knum">贰</span><h3>取径</h3><p>第一条路是减法。删掉所有标题，只留一串圆点。读者的余光会自然追踪那颗亮着的点，而不必把视线拉去读字。</p><p>圆球的好处是它几乎不占注意力，却始终在场。它把「目录」从一份清单，变成一种呼吸。</p></article>
+      <article class="chap"><span class="knum">叁</span><h3>器物</h3><p>实现上靠 IntersectionObserver 锁定当前章节，再用一次 class 切换驱动所有过渡。没有逐帧计算，滚动永远顺滑。</p><p>光圈用 box-shadow 的扩散来做，缩放用 transform，两者都走合成层，不触发重排。</p></article>
+      <article class="chap"><span class="knum">肆</span><h3>余响</h3><p>读到最后，那颗圆点停在底部，像一枚落定的印。你合上文章，它也熄灭。</p><p>克制本身就是一种风格。少即是多，在东方的纸上尤其成立。</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VARIANT B : 侧边刻度尺 (VERTICAL RULER / TICKS)
+============================================================ -->
+<section class="variant vB">
+  <div class="v-head">
+    <span class="v-tag">VARIANT B</span>
+    <span class="v-name">竖排刻度尺 · Ruler Ticks</span>
+  </div>
+  <p class="v-meta">一根细竖线作为脊柱，红色填充随滚动从上往下「灌墨」，每章一道刻度；当前刻度加长并标红，底部显示<b>阅读百分比</b>。 · <span class="v-src">灵感 editorial long-read 侧尺</span></p>
+  <div class="stage" data-stage="B">
+    <div class="railB">
+      <div class="rulerB">
+        <div class="spine"></div>
+        <div class="spine-fill" data-fill></div>
+        <div class="tick" data-go="0" style="top:14%"><span class="tlabel">序章</span></div>
+        <div class="tick" data-go="1" style="top:36%"><span class="tlabel">质料</span></div>
+        <div class="tick" data-go="2" style="top:58%"><span class="tlabel">尺度</span></div>
+        <div class="tick" data-go="3" style="top:80%"><span class="tlabel">收束</span></div>
+        <div class="pct" data-pct>0%</div>
+      </div>
+    </div>
+    <div class="doc">
+      <article class="chap"><span class="knum">壹</span><h3>序章</h3><p>刻度尺天生带着一种工程的冷静。它不哄你，它只告诉你事实：你在第几格，墨灌到哪里。</p><p>这条脊柱沿用主站的细金线气质，但把金换成了印章红，让进度成为页面里唯一会动的暖色。</p><p>灌墨的动作发生在滚动时，逐像素跟随，所以它永远不会和你的手指脱节。</p></article>
+      <article class="chap"><span class="knum">贰</span><h3>质料</h3><p>填充用 1px 宽的实线，高度跟着滚动比例线性增长，并加一层淡淡的红色辉光，让它在墨底上有一点温度。</p><p>刻度是绝对定位的小横杠，按章节在尺上的相对位置摆放，hover 才吐出标签。</p></article>
+      <article class="chap"><span class="knum">叁</span><h3>尺度</h3><p>当前章节的刻度会变长、变红、变粗一格，像尺子上被手指压住的那一道。它既是导航，也是确认。</p><p>百分比用衬线斜体的金色，藏在尺底，存在但不喧哗。</p></article>
+      <article class="chap"><span class="knum">肆</span><h3>收束</h3><p>读到尽头，墨灌满整根脊柱，百分比定格在某个接近一百的数字。</p><p>这是最有「仪表」感的一种，适合数据味重、章节分明的长文。</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VARIANT C : 编号目录 + 当前项进度 (NUMBERED INDEX)
+============================================================ -->
+<section class="variant vC">
+  <div class="v-head">
+    <span class="v-tag">VARIANT C</span>
+    <span class="v-name">编号目录 · Numbered Index</span>
+  </div>
+  <p class="v-meta">真正的「目录」：左侧列出全部章节标题与斜体编号，当前章高亮并右移，已读章变灰，当前项底部有一条<b>逐像素推进的红线</b>表示这一章读了多少。 · <span class="v-src">灵感 The Pudding 长读目录</span></p>
+  <div class="stage" data-stage="C">
+    <div class="railC">
+      <nav class="tocC">
+        <a class="tc-item" data-go="0"><span class="tc-num">01</span><span class="tc-txt">为什么需要目录</span><span class="tc-bar"></span></a>
+        <a class="tc-item" data-go="1"><span class="tc-num">02</span><span class="tc-txt">扫读与精读之间</span><span class="tc-bar"></span></a>
+        <a class="tc-item" data-go="2"><span class="tc-num">03</span><span class="tc-txt">高亮的分寸</span><span class="tc-bar"></span></a>
+        <a class="tc-item" data-go="3"><span class="tc-num">04</span><span class="tc-txt">读完之后</span><span class="tc-bar"></span></a>
+      </nav>
+    </div>
+    <div class="doc">
+      <article class="chap"><span class="knum">壹</span><h3>为什么需要目录</h3><p>长文最大的敌人不是长，而是迷路。目录把一篇文章从一条隧道，变成一张地图。</p><p>把全部标题摆出来，是给读者一个全局：他能预判旅程的形状，决定要不要走完，或者跳到哪一段。</p><p>这是信息最丰富的一种向导，代价是占用更多横向空间。</p></article>
+      <article class="chap"><span class="knum">贰</span><h3>扫读与精读之间</h3><p>大多数人先扫后读。目录服务的正是那次「扫」——让标题一眼可辨，让点击一步抵达。</p><p>当前项底部那条红线，是把宏观目录与微观进度缝在一起：你既知道在第几章，也知道这一章还剩多少。</p></article>
+      <article class="chap"><span class="knum">叁</span><h3>高亮的分寸</h3><p>高亮不能太响。这里只做三件事：编号转红、文字转亮、整行右移四像素。足够被余光捕捉，又不抢正文。</p><p>已读章节统一降为暗金灰，制造一种「走过的路」的层次。</p></article>
+      <article class="chap"><span class="knum">肆</span><h3>读完之后</h3><p>四章全部走完，整张目录沉为灰，只剩最后一项亮着。回头一看，路径清清楚楚。</p><p>这种方案最适合内容型、章节有实义的文章，比如一篇深度报道或方法论长文。</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VARIANT D : 顶部细横条 + 锯齿章节标记 (TOP HAIRLINE)
+============================================================ -->
+<section class="variant vD">
+  <div class="v-head">
+    <span class="v-tag">VARIANT D</span>
+    <span class="v-name">顶部细线 · Top Hairline</span>
+  </div>
+  <p class="v-meta">不占侧栏：顶部一条 2px 发丝进度条随滚动推进，上面嵌着每章的锯齿标记，当前标记跳成金色加高；左侧实时显示<b>当前章节名</b>，右侧显示百分比。 · <span class="v-src">灵感 Medium / NYT 阅读条</span></p>
+  <div class="stage" data-stage="D">
+    <div class="topwrapD">
+      <div class="meta"><span class="cur" data-cur>引子</span><span class="pct" data-pct>0%</span></div>
+      <div class="trackD">
+        <div class="fill" data-fill></div>
+        <div class="notch" data-go="0" style="left:0%"></div>
+        <div class="notch" data-go="1" style="left:30%"></div>
+        <div class="notch" data-go="2" style="left:62%"></div>
+        <div class="notch" data-go="3" style="left:88%"></div>
+      </div>
+    </div>
+    <div class="stage-inner">
+      <div class="doc">
+        <article class="chap"><span class="knum">壹</span><h3>引子</h3><p>有时候，读者不愿意为目录让出任何一寸正文宽度。那就把进度收到天花板上去。</p><p>顶部一条发丝粗细的线，是阅读体验里最不打扰的存在；它一直在，却要你主动抬头才看得见。</p><p>章节锯齿嵌在线上，像唱片上的轨缝，把连续的进度切成有意义的段。</p></article>
+        <article class="chap"><span class="knum">贰</span><h3>留白</h3><p>这个方案把横向空间全部还给文字，特别适合窄栏、移动端，或图文混排的杂志式长文。</p><p>左上角那行斜体小字会随章节切换，等于一个极简的「你正在读」提示。</p></article>
+        <article class="chap"><span class="knum">叁</span><h3>轨缝</h3><p>当前锯齿跳成金色并长高一截，是整条线上唯一的高光点。点它可以直接跳章。</p><p>百分比放在右上，与左侧章节名对称，构成一个安静的阅读仪表头。</p></article>
+        <article class="chap"><span class="knum">肆</span><h3>落幕</h3><p>红色填满整条线，百分比走到尽头，章节名停在最后一章。</p><p>最轻、最通用，几乎可以叠在任何已有版式之上而不破坏它。</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VARIANT E : 印章圆环表盘 (RADIAL SEAL DIAL)
+============================================================ -->
+<section class="variant vE">
+  <div class="v-head">
+    <span class="v-tag">VARIANT E</span>
+    <span class="v-name">印章表盘 · Seal Dial</span>
+  </div>
+  <p class="v-meta">把百分比做成一枚会转的圆环印章：红环随滚动绕圈填充，环心是<b>斜体阅读百分比</b>，下方一排小圆点对应章节、可点跳。最有「东方器物」气的一种。 · <span class="v-src">灵感 circular progress dial</span></p>
+  <div class="stage" data-stage="E">
+    <div class="railE">
+      <div class="dialE">
+        <svg viewBox="0 0 92 92">
+          <circle class="ring-bg" cx="46" cy="46" r="40"></circle>
+          <circle class="ring-fg" cx="46" cy="46" r="40" data-ring></circle>
+        </svg>
+        <div class="dial-num"><span data-num>0</span><small>%</small></div>
+        <div class="dotsE">
+          <span class="pip" data-go="0"></span>
+          <span class="pip" data-go="1"></span>
+          <span class="pip" data-go="2"></span>
+          <span class="pip" data-go="3"></span>
+        </div>
+        <div class="dial-cap" data-cap>开卷</div>
+      </div>
+    </div>
+    <div class="doc">
+      <article class="chap"><span class="knum">壹</span><h3>开卷</h3><p>圆，是印章的形状，也是完成的隐喻。把阅读进度盘成一个环，等于给读者一枚正在被盖下的章。</p><p>红环顺时针填充，环心数字跳动，整体像一台安静的仪表，又像一方未干的朱印。</p><p>这是最有装饰性、也最有记忆点的一种，适合作品集或叙事性强的页面。</p></article>
+      <article class="chap"><span class="knum">贰</span><h3>运笔</h3><p>环用 SVG 的 stroke-dashoffset 驱动，随滚动比例改变；数字同步刷新。整圈走完即满。</p><p>下方四颗小圆点对应章节，读过的转灰，当前的放大标红，点击即跳。</p></article>
+      <article class="chap"><span class="knum">叁</span><h3>分寸</h3><p>表盘虽然抢眼，但被钉在侧栏垂直居中、尺寸克制，不会盖过正文。颜色严格限定在红/金/墨三色内。</p><p>章节名以小字 caption 形式出现在环下，随当前章切换。</p></article>
+      <article class="chap"><span class="knum">肆</span><h3>落印</h3><p>读到末章，红环合拢成一个完整的圆，数字逼近一百。一篇文章，盖完一枚章。</p><p>仪式感拉满，代价是它最不「隐形」，要看场合用。</p></article>
+    </div>
+  </div>
+</section>
+
+<p class="footnote">五个变体彼此独立、互不干扰 · 局部封闭打样 · 选中后告诉我字母（<span>A–E</span>），我把那一段原生拼进主站长文页。</p>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // helper: per-stage scroll-spy controller
+  function spy(stageEl, opts){
+    var chaps = stageEl.querySelectorAll('.chap');
+    var navItems = opts.navItems(stageEl);
+    var current = -1;
+
+    function setActive(i){
+      if(i === current) return;
+      current = i;
+      navItems.forEach(function(el, idx){
+        el.classList.toggle('active', idx === i);
+        if(opts.markDone){
+          el.classList.toggle('done', idx < i);
+        }
+      });
+      if(opts.onChapter) opts.onChapter(i);
+    }
+
+    // determine active chapter by which one's top is nearest above the 38% line of the scroll viewport
+    function scan(){
+      var rect = stageEl.getBoundingClientRect ? null : null;
+      var line = stageEl.clientHeight * 0.38;
+      var best = 0;
+      for(var i=0;i<chaps.length;i++){
+        var top = chaps[i].offsetTop - stageEl.scrollTop;
+        if(top - line <= 0) best = i;
+      }
+      setActive(best);
+
+      // progress 0..1 over full scrollable height
+      var max = stageEl.scrollHeight - stageEl.clientHeight;
+      var p = max > 0 ? Math.min(1, stageEl.scrollTop / max) : 0;
+      if(opts.onProgress) opts.onProgress(p);
+    }
+
+    var raf = null;
+    stageEl.addEventListener('scroll', function(){
+      if(raf) return;
+      raf = requestAnimationFrame(function(){ raf = null; scan(); });
+    }, {passive:true});
+
+    // click-to-jump
+    navItems.forEach(function(el, idx){
+      el.addEventListener('click', function(){
+        var target = chaps[idx];
+        stageEl.scrollTo({ top: target.offsetTop - 24, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    });
+
+    scan();
+  }
+
+  // ---- VARIANT A : dot rail ----
+  var stA = document.querySelector('[data-stage="A"]');
+  spy(stA, { navItems: function(s){ return Array.prototype.slice.call(s.querySelectorAll('.dn-item')); } });
+
+  // ---- VARIANT B : ruler ----
+  var stB = document.querySelector('[data-stage="B"]');
+  var fillB = stB.querySelector('[data-fill]');
+  var pctB = stB.querySelector('[data-pct]');
+  var spineRange = 0.84; // spine spans 8%..92% => 84% of rail height
+  spy(stB, {
+    navItems: function(s){ return Array.prototype.slice.call(s.querySelectorAll('.tick')); },
+    onProgress: function(p){
+      var railH = stB.querySelector('.railB').clientHeight;
+      fillB.style.height = (p * spineRange * railH) + 'px';
+      pctB.textContent = Math.round(p*100) + '%';
+    }
+  });
+
+  // ---- VARIANT C : numbered index w/ per-chapter bar ----
+  var stC = document.querySelector('[data-stage="C"]');
+  var itemsC = Array.prototype.slice.call(stC.querySelectorAll('.tc-item'));
+  var chapsC = stC.querySelectorAll('.chap');
+  spy(stC, {
+    navItems: function(s){ return itemsC; },
+    markDone: true,
+    onProgress: function(){
+      // per-chapter fill on the active item
+      itemsC.forEach(function(it){ it.querySelector('.tc-bar').style.width = '0%'; });
+      var act = itemsC.findIndex(function(i){ return i.classList.contains('active'); });
+      if(act < 0) return;
+      var ch = chapsC[act];
+      var start = ch.offsetTop;
+      var end = (act+1 < chapsC.length) ? chapsC[act+1].offsetTop : stC.scrollHeight;
+      var pos = stC.scrollTop + stC.clientHeight*0.38;
+      var local = Math.max(0, Math.min(1, (pos - start)/(end - start)));
+      itemsC[act].querySelector('.tc-bar').style.width = (local*100) + '%';
+    }
+  });
+
+  // ---- VARIANT D : top hairline ----
+  var stD = document.querySelector('[data-stage="D"]');
+  var innerD = stD.querySelector('.stage-inner');
+  var fillD = stD.querySelector('[data-fill]');
+  var pctD = stD.querySelector('[data-pct]');
+  var curD = stD.querySelector('[data-cur]');
+  var notchesD = Array.prototype.slice.call(stD.querySelectorAll('.notch'));
+  var chapsD = innerD.querySelectorAll('.chap');
+  var titlesD = ['引子','留白','轨缝','落幕'];
+  var currentD = -1;
+  function scanD(){
+    var line = innerD.clientHeight * 0.38;
+    var best = 0;
+    for(var i=0;i<chapsD.length;i++){
+      if(chapsD[i].offsetTop - innerD.scrollTop - line <= 0) best = i;
+    }
+    if(best !== currentD){
+      currentD = best;
+      notchesD.forEach(function(n,idx){ n.classList.toggle('active', idx===best); });
+      curD.textContent = titlesD[best];
+    }
+    var max = innerD.scrollHeight - innerD.clientHeight;
+    var p = max>0 ? Math.min(1, innerD.scrollTop/max) : 0;
+    fillD.style.width = (p*100) + '%';
+    pctD.textContent = Math.round(p*100) + '%';
+  }
+  var rafD=null;
+  innerD.addEventListener('scroll', function(){ if(rafD) return; rafD=requestAnimationFrame(function(){rafD=null;scanD();}); }, {passive:true});
+  notchesD.forEach(function(n,idx){ n.addEventListener('click', function(){ innerD.scrollTo({top:chapsD[idx].offsetTop-10, behavior:reduce?'auto':'smooth'}); }); });
+  scanD();
+
+  // ---- VARIANT E : radial seal dial ----
+  var stE = document.querySelector('[data-stage="E"]');
+  var ring = stE.querySelector('[data-ring]');
+  var num = stE.querySelector('[data-num]');
+  var cap = stE.querySelector('[data-cap]');
+  var pips = Array.prototype.slice.call(stE.querySelectorAll('.pip'));
+  var capsE = ['开卷','运笔','分寸','落印'];
+  var CIRC = 2 * Math.PI * 40;
+  ring.style.strokeDasharray = CIRC;
+  ring.style.strokeDashoffset = CIRC;
+  spy(stE, {
+    navItems: function(s){ return pips; },
+    markDone: true,
+    onChapter: function(i){ cap.textContent = capsE[i] || ''; },
+    onProgress: function(p){
+      ring.style.strokeDashoffset = CIRC * (1 - p);
+      num.textContent = Math.round(p*100);
+    }
+  });
+
+  // subtle reveal of variant headers via GSAP (decorative only)
+  if(window.gsap && !reduce){
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.variant').forEach(function(v){
+      gsap.from(v.querySelector('.v-head'), {
+        opacity:0, y:24, duration:.9, ease:'power3.out',
+        scrollTrigger:{ trigger:v, start:'top 80%' }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

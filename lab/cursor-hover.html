@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab · 光标与悬停微交互 — 胡晋豪</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ============ 设计系统底座 ============ */
+:root{
+  --ink:#14110c; --ink-2:#1b1711; --ink-3:#221d15;
+  --ivory:#efe7d5; --dim:#b1a890; --faint:#7c7260; --line:#2d2618;
+  --seal:#c5402a; --seal-deep:#9b2f1f; --gold:#cda153;
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Jost',sans-serif;
+  --cal:'Ma Shan Zheng',cursive;
+  --hand:'Long Cang',cursive;
+  --zh:'Noto Serif SC',serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--ink); color:var(--ivory);
+  font-family:var(--serif); line-height:1.5;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* 纸张噪点叠层 */
+body::before{
+  content:""; position:fixed; inset:0; z-index:1; pointer-events:none;
+  opacity:.045; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* 暗角 */
+body::after{
+  content:""; position:fixed; inset:0; z-index:1; pointer-events:none;
+  box-shadow:inset 0 0 220px 60px rgba(0,0,0,.55);
+}
+.label{
+  font-family:var(--sans); font-weight:500; text-transform:uppercase;
+  letter-spacing:.26em; font-size:11px; color:var(--faint);
+}
+
+/* ============ 页头 ============ */
+.top{
+  position:relative; z-index:5;
+  display:flex; align-items:baseline; justify-content:space-between;
+  padding:34px 48px 0;
+}
+.back{
+  font-family:var(--sans); font-size:12px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--dim); text-decoration:none; position:relative; padding-bottom:4px;
+}
+.back::before{content:"←  ";}
+.back::after{
+  content:""; position:absolute; left:0; bottom:0; width:100%; height:1px;
+  background:var(--gold); transform:scaleX(0); transform-origin:right;
+  transition:transform .5s var(--ease);
+}
+.back:hover::after{transform:scaleX(1); transform-origin:left;}
+.top .dim-id{font-family:var(--sans); font-size:11px; letter-spacing:.26em; color:var(--faint);}
+
+.hero{
+  position:relative; z-index:5;
+  padding:60px 48px 30px; border-bottom:1px solid var(--line);
+}
+.hero .label{display:block; margin-bottom:18px;}
+.hero h1{
+  font-weight:300; font-size:clamp(40px,7vw,86px); line-height:.98;
+  letter-spacing:-.01em;
+}
+.hero h1 .zh{font-family:var(--hand); color:var(--gold); font-size:.82em; margin-left:.1em;}
+.hero p{
+  font-family:var(--zh); font-weight:300; color:var(--dim);
+  max-width:560px; margin-top:20px; font-size:15px; line-height:1.9;
+}
+
+/* ============ 变体网格 ============ */
+.lab-grid{
+  position:relative; z-index:5;
+  display:grid; grid-template-columns:1fr 1fr; gap:0;
+}
+.variant{
+  position:relative; min-height:440px;
+  border-bottom:1px solid var(--line); border-right:1px solid var(--line);
+  padding:38px 40px 44px;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+.variant:nth-child(odd){border-right:1px solid var(--line);}
+.v-head{display:flex; align-items:center; gap:14px; margin-bottom:6px;}
+.v-tag{
+  font-family:var(--sans); font-weight:500; font-size:11px; letter-spacing:.22em;
+  color:var(--ink); background:var(--gold); padding:4px 10px; text-transform:uppercase;
+}
+.v-title{font-family:var(--zh); font-weight:500; font-size:17px; color:var(--ivory);}
+.v-desc{
+  font-family:var(--sans); font-weight:300; font-size:12px; letter-spacing:.04em;
+  color:var(--faint); line-height:1.7; margin-top:10px; max-width:90%;
+}
+.v-desc b{color:var(--dim); font-weight:400;}
+.v-stage{
+  flex:1; margin-top:26px; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line); border-radius:2px;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(205,161,83,.04), transparent 60%),
+    var(--ink-2);
+}
+
+/* ====================================================================== */
+/* VARIANT A · 磁性按钮 (Magnetic) — 灵感: Cuberto / 100daysofcraft        */
+/* ====================================================================== */
+.magnetic-wrap{display:flex; gap:30px; flex-direction:column; align-items:center;}
+.magnetic-btn{
+  position:relative; cursor:pointer;
+  font-family:var(--sans); font-weight:400; letter-spacing:.22em; text-transform:uppercase;
+  font-size:13px; color:var(--ivory);
+  padding:20px 44px; border:1px solid var(--gold);
+  background:transparent; border-radius:50px;
+  will-change:transform;
+}
+.magnetic-btn .mg-label{display:inline-block; will-change:transform;}
+.magnetic-btn::before{
+  content:""; position:absolute; inset:0; border-radius:50px; z-index:-1;
+  background:var(--seal); transform:scale(0); opacity:0;
+  transition:transform .5s var(--ease), opacity .5s var(--ease);
+}
+.magnetic-btn.is-hover::before{transform:scale(1); opacity:1;}
+.magnetic-btn.is-hover{border-color:var(--seal);}
+
+/* ====================================================================== */
+/* VARIANT B · 淡墨光标 (Ink Blob Follower) — 灵感: Awwwards 自定义光标       */
+/* ====================================================================== */
+.ink-stage{cursor:none;}
+.ink-stage .hint{
+  font-family:var(--zh); font-weight:300; color:var(--faint); font-size:14px;
+  text-align:center; pointer-events:none;
+}
+.ink-stage .hint span{
+  display:inline-block; font-family:var(--sans); letter-spacing:.16em; font-size:11px;
+  color:var(--dim); margin-top:10px;
+}
+.ink-magnets{display:flex; gap:18px; margin-top:24px; justify-content:center; flex-wrap:wrap;}
+.ink-magnet{
+  font-family:var(--sans); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--dim); padding:10px 18px; border:1px solid var(--line); border-radius:2px;
+  transition:color .4s var(--ease), border-color .4s var(--ease);
+}
+.ink-blob{
+  position:absolute; top:0; left:0; width:46px; height:46px; border-radius:50%;
+  background:radial-gradient(circle at 38% 35%, rgba(239,231,213,.95), rgba(177,168,144,.5) 55%, transparent 72%);
+  pointer-events:none; z-index:9; mix-blend-mode:screen;
+  transform:translate(-50%,-50%); will-change:transform,width,height;
+  filter:blur(.4px);
+}
+.ink-dot{
+  position:absolute; top:0; left:0; width:6px; height:6px; border-radius:50%;
+  background:var(--seal); pointer-events:none; z-index:10;
+  transform:translate(-50%,-50%); will-change:transform;
+}
+
+/* ====================================================================== */
+/* VARIANT C · 反色擦除链接 (Wipe Reveal) — 灵感: Awwwards Hovers 合集        */
+/* ====================================================================== */
+.wipe-list{display:flex; flex-direction:column; gap:4px; width:100%; max-width:300px;}
+.wipe-link{
+  position:relative; display:block; overflow:hidden;
+  font-family:var(--serif); font-weight:400; font-size:34px; line-height:1.25;
+  padding:6px 14px; text-decoration:none; color:var(--ivory);
+  border-radius:2px;
+}
+.wipe-link .fill{
+  position:absolute; inset:0; background:var(--seal); z-index:0;
+  transform:scaleY(0); transform-origin:bottom;
+  transition:transform .45s var(--ease);
+}
+.wipe-link:hover .fill{transform:scaleY(1);}
+.wipe-link .txt{position:relative; z-index:1; display:flex; flex-direction:column; height:1.25em; overflow:hidden;}
+.wipe-link .txt span{display:block; transition:transform .45s var(--ease); will-change:transform;}
+.wipe-link .txt .b{color:var(--ink); font-style:italic; font-weight:500;}
+.wipe-link:hover .txt span{transform:translateY(-1.25em);}
+
+/* ====================================================================== */
+/* VARIANT D · 倾斜视差卷轴 (Tilt Parallax) — 灵感: Codrops Image Tilt        */
+/* ====================================================================== */
+.tilt-card{
+  position:relative; width:230px; height:300px; border-radius:3px;
+  transform-style:preserve-3d; will-change:transform;
+  border:1px solid var(--line);
+  background:linear-gradient(160deg,var(--ink-3),var(--ink-2));
+  cursor:pointer;
+}
+.tilt-card .layer{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; will-change:transform;}
+.tilt-card .seal-block{
+  width:96px; height:96px; background:var(--seal);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--cal); font-size:52px; color:var(--ivory);
+  box-shadow:0 18px 40px rgba(0,0,0,.5);
+}
+.tilt-card .ring{
+  width:160px; height:160px; border:1px solid var(--gold); border-radius:50%;
+  opacity:.45;
+}
+.tilt-card .cap{
+  align-items:flex-end; justify-content:flex-start; padding:18px;
+}
+.tilt-card .cap div{font-family:var(--sans); letter-spacing:.2em; font-size:10px; text-transform:uppercase; color:var(--dim);}
+.tilt-card .glare{
+  position:absolute; inset:0; border-radius:3px; pointer-events:none;
+  background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(205,161,83,.22), transparent 60%);
+  opacity:0; transition:opacity .4s var(--ease);
+}
+.tilt-card:hover .glare{opacity:1;}
+
+/* ====================================================================== */
+/* VARIANT E · 金色流光高光 (Gold Sheen Reflection) — 灵感: Awwwards 手电筒    */
+/* ====================================================================== */
+.sheen-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; width:100%; max-width:330px;}
+.sheen-card{
+  position:relative; overflow:hidden; border-radius:2px;
+  border:1px solid var(--line); background:var(--ink-3);
+  padding:22px 18px; min-height:120px;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.sheen-card .k{font-family:var(--hand); font-size:30px; color:var(--ivory); line-height:1;}
+.sheen-card .v{font-family:var(--sans); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--faint);}
+.sheen-card .sheen{
+  position:absolute; top:0; left:0; width:160%; height:100%;
+  background:linear-gradient(105deg,transparent 38%, rgba(205,161,83,.0) 42%, rgba(205,161,83,.55) 50%, rgba(205,161,83,.0) 58%, transparent 62%);
+  transform:translateX(-120%) skewX(-12deg);
+  pointer-events:none; mix-blend-mode:screen;
+}
+.sheen-card:hover{border-color:rgba(205,161,83,.5);}
+
+/* ============ 页脚 ============ */
+footer{
+  position:relative; z-index:5; padding:40px 48px;
+  font-family:var(--sans); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--faint); text-align:center;
+}
+
+@media(max-width:820px){
+  .lab-grid{grid-template-columns:1fr;}
+  .variant{border-right:none;}
+  .top,.hero,footer{padding-left:24px; padding-right:24px;}
+}
+
+/* ============ 无障碍降级 ============ */
+@media (prefers-reduced-motion: reduce){
+  *{transition-duration:.01ms !important; animation-duration:.01ms !important;}
+  .ink-blob,.ink-dot{display:none;}
+  .ink-stage{cursor:auto;}
+  .magnetic-btn,.tilt-card,.magnetic-btn .mg-label{transform:none !important;}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="back" href="./index.html">返回 Lab</a>
+  <span class="dim-id">Dimension · 06</span>
+</header>
+
+<section class="hero">
+  <span class="label">Cursor &amp; Hover Micro-interactions</span>
+  <h1>光标与悬停<span class="zh">手感</span></h1>
+  <p>同一套墨/印章系统下的五种微交互打样。每个变体相互独立、各自封闭，把鼠标移上去用直觉对比，选中一个我直接拼回主站。技法本地化自 Cuberto 磁性吸附、Awwwards 自定义光标与手电筒、Codrops 图片倾斜。</p>
+</section>
+
+<main class="lab-grid">
+
+  <!-- ===================== VARIANT A · 磁性按钮 ===================== -->
+  <section class="variant">
+    <div class="v-head"><span class="v-tag">Variant A</span><span class="v-title">磁性按钮</span></div>
+    <p class="v-desc">按钮在接近时被光标「吸住」并轻微跟随，内文字层做二次位移加深纵深；离开即弹回中心，红印底色从中央生长。<b>手感: 黏滞、有引力、克制（位移上限 ~14px）。灵感: Cuberto。</b></p>
+    <div class="v-stage">
+      <div class="magnetic-wrap">
+        <button class="magnetic-btn" data-magnetic><span class="mg-label">取得联系</span></button>
+        <button class="magnetic-btn" data-magnetic><span class="mg-label">View Work</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VARIANT B · 淡墨光标 ===================== -->
+  <section class="variant">
+    <div class="v-head"><span class="v-tag">Variant B</span><span class="v-title">淡墨光标</span></div>
+    <p class="v-desc">隐藏系统光标，代之以一团滞后跟随的淡墨晕（lerp 0.16）加一颗即时印红实心点。悬到可点元素上墨晕放大、文字转金。<b>手感: 一团化开的墨，软而有延迟。灵感: Awwwards 自定义光标。</b></p>
+    <div class="v-stage ink-stage" id="inkStage">
+      <div class="ink-blob" id="inkBlob"></div>
+      <div class="ink-dot" id="inkDot"></div>
+      <div>
+        <div class="hint">在此区域内移动鼠标<br><span>HOVER THE LABELS BELOW</span></div>
+        <div class="ink-magnets">
+          <span class="ink-magnet" data-ink>关于</span>
+          <span class="ink-magnet" data-ink>作品</span>
+          <span class="ink-magnet" data-ink>书法</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VARIANT C · 反色擦除链接 ===================== -->
+  <section class="variant">
+    <div class="v-head"><span class="v-tag">Variant C</span><span class="v-title">反色擦除链接</span></div>
+    <p class="v-desc">导航链接 hover 时印红底色自下而上铺满，文字同步向上翻一行换成墨色斜体副本，像盖章后揭起。<b>手感: 干脆的卷帘 + 整词翻面，信息密度高。灵感: Awwwards Hovers 合集。</b></p>
+    <div class="v-stage">
+      <nav class="wipe-list">
+        <a class="wipe-link" href="#" onclick="return false"><span class="fill"></span><span class="txt"><span class="a">作品集</span><span class="b">Selected</span></span></a>
+        <a class="wipe-link" href="#" onclick="return false"><span class="fill"></span><span class="txt"><span class="a">关于我</span><span class="b">About</span></span></a>
+        <a class="wipe-link" href="#" onclick="return false"><span class="fill"></span><span class="txt"><span class="a">联系</span><span class="b">Contact</span></span></a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ===================== VARIANT D · 倾斜视差卷轴 ===================== -->
+  <section class="variant">
+    <div class="v-head"><span class="v-tag">Variant D</span><span class="v-title">倾斜视差卡片</span></div>
+    <p class="v-desc">卡片随光标做 3D 透视倾斜（rotateX/Y），内层印章块与金环以不同深度反向位移形成视差，金色高光跟随光标位置。<b>手感: 实体卡片被指尖托起，有重量。灵感: Codrops Image Tilt。</b></p>
+    <div class="v-stage" style="perspective:900px;">
+      <div class="tilt-card" id="tiltCard">
+        <div class="glare"></div>
+        <div class="layer" data-depth="14"><div class="ring"></div></div>
+        <div class="layer" data-depth="30"><div class="seal-block">胡</div></div>
+        <div class="layer cap" data-depth="20"><div>晋豪 · 2026</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VARIANT E · 金色流光高光 ===================== -->
+  <section class="variant" style="grid-column:1 / -1;">
+    <div class="v-head"><span class="v-tag">Variant E</span><span class="v-title">金色流光高光</span></div>
+    <p class="v-desc">卡片 hover 时一道金色斜向高光从左到右扫过表面（screen 混合模式），呼应金箔反光与擦漆。<b>手感: 一闪而过的金属反光，安静高级，不抢戏。灵感: Awwwards 手电筒 / 高光反射。</b></p>
+    <div class="v-stage" style="min-height:200px;">
+      <div class="sheen-grid">
+        <div class="sheen-card" data-sheen><span class="k">墨</span><span class="v">Calligraphy</span><span class="sheen"></span></div>
+        <div class="sheen-card" data-sheen><span class="k">画</span><span class="v">Gallery</span><span class="sheen"></span></div>
+        <div class="sheen-card" data-sheen><span class="k">印</span><span class="v">Seal</span><span class="sheen"></span></div>
+        <div class="sheen-card" data-sheen><span class="k">字</span><span class="v">Type</span><span class="sheen"></span></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>胡晋豪 个人站 · Lab 打样 · 单选一个变体即可原生拼接</footer>
+
+<script>
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if(!reduce){
+/* ============================================================
+   VARIANT A · 磁性按钮 (Magnetic)
+   技法: 光标相对中心的偏移 × 强度系数, GSAP 弹性回弹.
+   位移上限约束防止「飞走」(strength≈0.35, 文字层二次跟随).
+   ============================================================ */
+document.querySelectorAll('[data-magnetic]').forEach(btn=>{
+  const label = btn.querySelector('.mg-label');
+  const strength = 0.35, labelStrength = 0.55, max = 14;
+  btn.addEventListener('mousemove', e=>{
+    const r = btn.getBoundingClientRect();
+    let x = (e.clientX - r.left - r.width/2) * strength;
+    let y = (e.clientY - r.top - r.height/2) * strength;
+    x = Math.max(-max, Math.min(max, x));
+    y = Math.max(-max, Math.min(max, y));
+    gsap.to(btn,{x,y,scale:1.02,duration:.5,ease:'power3.out'});
+    gsap.to(label,{x:x*labelStrength,y:y*labelStrength,duration:.5,ease:'power3.out'});
+  });
+  btn.addEventListener('mouseenter', ()=>btn.classList.add('is-hover'));
+  btn.addEventListener('mouseleave', ()=>{
+    btn.classList.remove('is-hover');
+    gsap.to([btn,label],{x:0,y:0,scale:1,duration:.7,ease:'elastic.out(1,.4)'});
+  });
+});
+
+/* ============================================================
+   VARIANT B · 淡墨光标 (Ink Blob Follower)
+   技法: 印红点即时贴合鼠标; 墨晕用 lerp(0.16) 滞后追随,
+   悬停可点元素时放大 + 降不透明, 局部封闭在 stage 内.
+   ============================================================ */
+(function(){
+  const stage = document.getElementById('inkStage');
+  const blob = document.getElementById('inkBlob');
+  const dot = document.getElementById('inkDot');
+  let tx=0,ty=0, bx=0,by=0, inside=false, scale=1, tScale=1;
+  stage.addEventListener('mouseenter',()=>{inside=true; blob.style.opacity=1; dot.style.opacity=1;});
+  stage.addEventListener('mouseleave',()=>{inside=false; blob.style.opacity=0; dot.style.opacity=0;});
+  stage.addEventListener('mousemove',e=>{
+    const r=stage.getBoundingClientRect();
+    tx=e.clientX-r.left; ty=e.clientY-r.top;
+    dot.style.transform=`translate(${tx}px,${ty}px) translate(-50%,-50%)`;
+  });
+  stage.querySelectorAll('[data-ink]').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{tScale=2.1; el.style.color='var(--gold)'; el.style.borderColor='var(--gold)';});
+    el.addEventListener('mouseleave',()=>{tScale=1; el.style.color=''; el.style.borderColor='';});
+  });
+  function loop(){
+    bx += (tx-bx)*0.16; by += (ty-by)*0.16;
+    scale += (tScale-scale)*0.12;
+    blob.style.transform=`translate(${bx}px,${by}px) translate(-50%,-50%) scale(${scale})`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ============================================================
+   VARIANT D · 倾斜视差卡片 (Tilt Parallax)
+   技法: 鼠标相对卡片中心的归一化偏移 -> rotateX/Y;
+   内层按 data-depth 反向位移做视差; CSS 变量驱动金色高光.
+   ============================================================ */
+(function(){
+  const card = document.getElementById('tiltCard');
+  const layers = card.querySelectorAll('.layer');
+  const maxTilt = 12;
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const px=(e.clientX-r.left)/r.width-0.5;
+    const py=(e.clientY-r.top)/r.height-0.5;
+    gsap.to(card,{rotateY:px*maxTilt,rotateX:-py*maxTilt,duration:.5,ease:'power2.out'});
+    layers.forEach(l=>{
+      const d=parseFloat(l.dataset.depth);
+      gsap.to(l,{x:px*d,y:py*d,duration:.5,ease:'power2.out'});
+    });
+    card.style.setProperty('--mx',`${(px+0.5)*100}%`);
+    card.style.setProperty('--my',`${(py+0.5)*100}%`);
+  });
+  card.addEventListener('mouseleave',()=>{
+    gsap.to(card,{rotateX:0,rotateY:0,duration:.8,ease:'elastic.out(1,.5)'});
+    layers.forEach(l=>gsap.to(l,{x:0,y:0,duration:.8,ease:'elastic.out(1,.5)'}));
+  });
+})();
+
+/* ============================================================
+   VARIANT E · 金色流光高光 (Gold Sheen)
+   技法: 一道 skew 高光带从左扫到右, hover 触发 GSAP 单次扫光.
+   ============================================================ */
+document.querySelectorAll('[data-sheen]').forEach(card=>{
+  const sheen=card.querySelector('.sheen');
+  card.addEventListener('mouseenter',()=>{
+    gsap.fromTo(sheen,
+      {x:'-120%'},
+      {x:'120%',duration:.85,ease:'power2.inOut'});
+  });
+});
+} // end !reduce
+</script>
+</body>
+</html>

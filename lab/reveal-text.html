@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab · 文字与滚动揭示动效</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ============================================================
+   设计系统 — 墨 / 印章
+   ============================================================ */
+:root{
+  --ink:#14110c; --ink-2:#1b1711; --ink-3:#221d15;
+  --ivory:#efe7d5; --dim:#b1a890; --faint:#7c7260; --line:#2d2618;
+  --seal:#c5402a; --seal-deep:#9b2f1f; --gold:#cda153;
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Jost',sans-serif;
+  --cal:'Ma Shan Zheng',cursive;
+  --hand:'Long Cang',cursive;
+  --zh:'Noto Serif SC',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--ivory);
+  font-family:var(--serif);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* 纸张噪点叠层 + 暗角 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+.label{
+  font-family:var(--sans);font-weight:500;text-transform:uppercase;
+  letter-spacing:.26em;font-size:11px;color:var(--faint);
+}
+
+/* ---- 顶栏 ---- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 36px;
+  background:linear-gradient(to bottom,rgba(20,17,12,.96),rgba(20,17,12,.7) 70%,transparent);
+  backdrop-filter:blur(2px);
+}
+.topbar a.back{
+  font-family:var(--sans);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--dim);text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+  transition:color .4s;
+}
+.topbar a.back:hover{color:var(--ivory)}
+.topbar a.back::before{content:"←";color:var(--seal);font-size:15px}
+.topbar .dim-title{
+  font-family:var(--sans);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint);
+}
+
+/* ---- 区段框架 ---- */
+.intro{
+  position:relative;z-index:2;
+  padding:90px 36px 40px;max-width:980px;margin:0 auto;text-align:center;
+}
+.intro .seal-mark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:48px;height:48px;background:var(--seal);color:var(--ivory);
+  font-family:var(--cal);font-size:26px;border-radius:3px;margin-bottom:26px;
+  box-shadow:0 6px 24px rgba(155,47,31,.4);
+}
+.intro h1{
+  font-size:clamp(40px,7vw,82px);font-weight:300;line-height:1.04;letter-spacing:.01em;
+}
+.intro h1 .zh{font-family:var(--zh);font-weight:400}
+.intro p.sub{
+  font-family:var(--zh);font-weight:300;color:var(--dim);
+  font-size:16px;line-height:1.9;max-width:540px;margin:24px auto 0;
+}
+
+.variant{
+  position:relative;z-index:2;
+  min-height:96vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:120px 7vw;
+  border-top:1px solid var(--line);
+}
+.variant .vtag{
+  position:absolute;top:46px;left:7vw;
+  display:flex;align-items:baseline;gap:16px;
+}
+.variant .vtag .vbig{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:30px;color:var(--seal);line-height:1;
+}
+.variant .vtag .vname{
+  font-family:var(--sans);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--dim);
+}
+.variant .vnote{
+  position:absolute;top:46px;right:7vw;max-width:300px;text-align:right;
+}
+.variant .vnote .feel{
+  font-family:var(--zh);font-weight:300;font-size:13px;color:var(--dim);line-height:1.8;
+}
+.variant .vnote .src{
+  display:block;margin-top:8px;
+  font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);
+}
+.variant .vnote .src::before{content:"灵感 · ";color:var(--gold)}
+
+/* 复位提示 */
+.replay{
+  position:absolute;bottom:40px;left:7vw;
+  font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--faint);background:none;border:1px solid var(--line);
+  padding:8px 16px;border-radius:2px;cursor:pointer;transition:all .4s;
+}
+.replay:hover{color:var(--ivory);border-color:var(--seal)}
+
+/* ============================================================
+   VARIANT A — 行级卷帘 (line mask, overflow:clip, 由下升起)
+   灵感: Codrops SplitText line-mask
+   ============================================================ */
+#vA .stage{max-width:880px}
+#vA .line-mask{
+  overflow:hidden;            /* 卷帘窗口 */
+  display:block;
+}
+#vA .line-mask .inner{
+  display:block;
+  font-size:clamp(30px,5.4vw,64px);font-weight:300;line-height:1.18;letter-spacing:.01em;
+  will-change:transform;
+}
+#vA .line-mask .inner.zh{font-family:var(--zh);font-weight:400}
+#vA .line-mask:not(:last-child){margin-bottom:.1em}
+#vA em{font-style:italic;color:var(--gold)}
+
+/* ============================================================
+   VARIANT B — 逐字错落 (char stagger, blur + 上浮)
+   灵感: Codrops SplitText chars
+   ============================================================ */
+#vB .stage{max-width:900px}
+#vB .ch-line{
+  font-size:clamp(28px,5vw,58px);font-weight:300;line-height:1.3;
+}
+#vB .ch-line.zh{font-family:var(--zh);font-weight:400;letter-spacing:.04em}
+#vB .char{display:inline-block;will-change:transform,opacity,filter}
+#vB .seal-word{color:var(--seal)}
+
+/* ============================================================
+   VARIANT C — 聚焦显影 (blur-in focus, 整块从虚到实)
+   灵感: Awwwards "Text Blur Reveal" (Dolsten & Co.)
+   ============================================================ */
+#vC .stage{max-width:760px}
+#vC .blur-block{will-change:filter,opacity,transform}
+#vC .blur-block .kicker{
+  font-family:var(--sans);font-size:12px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--seal);margin-bottom:22px;
+}
+#vC .blur-block .big{
+  font-family:var(--zh);font-weight:300;
+  font-size:clamp(26px,4.4vw,46px);line-height:1.55;color:var(--ivory);
+}
+#vC .blur-block .big .gold{color:var(--gold)}
+
+/* ============================================================
+   VARIANT D — 逐词点亮 (scrub word-ignite, 引言大字)
+   灵感: 经典 scroll-scrub pull-quote (Awwwards 长滚引言)
+   ============================================================ */
+#vD{min-height:200vh;justify-content:flex-start}
+#vD .pin-wrap{
+  position:sticky;top:0;height:100vh;
+  display:flex;align-items:center;justify-content:center;padding:0 7vw;
+}
+#vD .quote{
+  max-width:1000px;text-align:center;
+  font-family:var(--zh);font-weight:300;
+  font-size:clamp(26px,4.6vw,52px);line-height:1.6;
+}
+#vD .quote .w{color:var(--faint);transition:none;will-change:color}
+#vD .quote .w.seal{}    /* 标记词，点亮时转印章红 */
+
+/* ============================================================
+   VARIANT E — 卷帘斜切 (clip-path 斜向揭幕 + 视差)
+   灵感: Codrops clip-path wipe / Oaksun scroll reveal
+   ============================================================ */
+#vE .stage{max-width:920px;display:flex;flex-direction:column;gap:6px}
+#vE .clip-row{overflow:hidden}
+#vE .clip-row .clip-inner{
+  font-family:var(--hand);
+  font-size:clamp(48px,9vw,120px);line-height:1;color:var(--ivory);
+  will-change:clip-path,transform;
+  /* 斜向 inset 由下方对角线揭开 */
+  clip-path:inset(0 100% 0 0);
+}
+#vE .clip-row .meta{
+  font-family:var(--sans);font-size:11px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--faint);margin-top:14px;
+}
+#vE .gold-rule{height:1px;background:linear-gradient(90deg,var(--gold),transparent);width:0;margin-top:30px}
+
+/* ---- 收尾 ---- */
+.outro{
+  position:relative;z-index:2;text-align:center;padding:120px 36px 140px;
+  border-top:1px solid var(--line);
+}
+.outro .seal-mark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;background:var(--seal);color:var(--ivory);
+  font-family:var(--cal);font-size:22px;border-radius:3px;margin-bottom:20px;
+}
+.outro p{font-family:var(--zh);font-weight:300;color:var(--faint);font-size:14px;letter-spacing:.04em}
+
+@media (max-width:680px){
+  .variant{padding:140px 24px 90px}
+  .variant .vtag{left:24px}.variant .vnote{right:24px;max-width:200px}
+  .replay{left:24px}
+  #vD .pin-wrap{padding:0 24px}
+}
+
+/* 降级: 关闭一切位移/模糊, 直接呈现终态 */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+  #vA .line-mask .inner{transform:none!important}
+  #vB .char{opacity:1!important;transform:none!important;filter:none!important}
+  #vC .blur-block{opacity:1!important;filter:none!important;transform:none!important}
+  #vD .quote .w{color:var(--ivory)!important}
+  #vE .clip-row .clip-inner{clip-path:inset(0 0 0 0)!important;transform:none!important}
+  #vE .gold-rule{width:160px!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ 顶栏 ============ -->
+<div class="topbar">
+  <a href="./index.html" class="back">返回 Lab</a>
+  <span class="dim-title">维度 · 文字与滚动揭示动效</span>
+</div>
+
+<!-- ============ 引子 ============ -->
+<section class="intro">
+  <span class="seal-mark">胡</span>
+  <h1>滚动之间，<span class="zh">字现</span></h1>
+  <p class="sub">五种文字揭示手感并排打样。向下滚动让每个变体各自触发，凭直觉单选一种拼回主站。</p>
+</section>
+
+<!-- ============================================================
+     VARIANT A — 行级卷帘 line mask
+     ============================================================ -->
+<section class="variant" id="vA">
+  <div class="vtag"><span class="vbig">A</span><span class="vname">行级卷帘 · Line Mask</span></div>
+  <div class="vnote">
+    <span class="feel">每行像从一道窄缝里被推上来，前后错开半拍，克制而有重量。</span>
+    <span class="src">Codrops SplitText</span>
+  </div>
+  <div class="stage">
+    <span class="line-mask"><span class="inner">A line rises from beneath</span></span>
+    <span class="line-mask"><span class="inner">its own <em>horizon</em>, one after</span></span>
+    <span class="line-mask"><span class="inner zh">另一行，半拍之后，缓缓登场。</span></span>
+  </div>
+  <button class="replay" data-replay="A">重播此变体</button>
+</section>
+
+<!-- ============================================================
+     VARIANT B — 逐字错落 char stagger + blur
+     ============================================================ -->
+<section class="variant" id="vB">
+  <div class="vtag"><span class="vbig">B</span><span class="vname">逐字错落 · Char Stagger</span></div>
+  <div class="vnote">
+    <span class="feel">单字逐个上浮、由虚转实，密集而灵动，像墨点逐一落定。</span>
+    <span class="src">Codrops SplitText chars</span>
+  </div>
+  <div class="stage">
+    <p class="ch-line" data-split="char">Letters settle one</p>
+    <p class="ch-line" data-split="char">by one into <span class="seal-word">focus</span></p>
+    <p class="ch-line zh" data-split="char">墨点逐一落定成字。</p>
+  </div>
+  <button class="replay" data-replay="B">重播此变体</button>
+</section>
+
+<!-- ============================================================
+     VARIANT C — 聚焦显影 blur-in focus
+     ============================================================ -->
+<section class="variant" id="vC">
+  <div class="vtag"><span class="vbig">C</span><span class="vname">聚焦显影 · Blur Focus</span></div>
+  <div class="vnote">
+    <span class="feel">整块文字从一片失焦的雾里被对上焦，温柔、电影感、不抢戏。</span>
+    <span class="src">Awwwards · Dolsten & Co.</span>
+  </div>
+  <div class="stage">
+    <div class="blur-block">
+      <div class="kicker">Out of focus</div>
+      <p class="big">一段文字从<span class="gold">失焦</span>的雾里浮现，<br>边缘渐渐对实，像镜头缓缓<span class="gold">对上焦</span>。</p>
+    </div>
+  </div>
+  <button class="replay" data-replay="C">重播此变体</button>
+</section>
+
+<!-- ============================================================
+     VARIANT D — 逐词点亮 scrub ignite (pinned)
+     ============================================================ -->
+<section class="variant" id="vD">
+  <div class="vtag"><span class="vbig">D</span><span class="vname">逐词点亮 · Scrub Ignite</span></div>
+  <div class="vnote">
+    <span class="feel">滚动直接驱动每个词由暗到亮，节奏完全握在指尖，适合宣言式引言。</span>
+    <span class="src">Awwwards 长滚引言</span>
+  </div>
+  <div class="pin-wrap">
+    <p class="quote" data-ignite>设计 不是 把东西 做得 好看 而是 让 每一次 <span class="mark">滚动</span> 都 像 一次 <span class="mark">显影</span></p>
+  </div>
+</section>
+
+<!-- ============================================================
+     VARIANT E — 卷帘斜切 clip-path wipe + 视差
+     ============================================================ -->
+<section class="variant" id="vE">
+  <div class="vtag"><span class="vbig">E</span><span class="vname">斜切揭幕 · Clip Wipe</span></div>
+  <div class="vnote">
+    <span class="feel">大字被一道幕布从左向右抹开露出，行书笔意配金线收尾，气场最足。</span>
+    <span class="src">Codrops clip-path / Oaksun</span>
+  </div>
+  <div class="stage">
+    <div class="clip-row"><span class="clip-inner">墨</span></div>
+    <div class="clip-row"><span class="clip-inner">显影</span><div class="meta">Revealed by a sweeping curtain</div></div>
+    <div class="gold-rule"></div>
+  </div>
+  <button class="replay" data-replay="E">重播此变体</button>
+</section>
+
+<!-- ============ 收尾 ============ -->
+<section class="outro">
+  <span class="seal-mark">墨</span>
+  <p>五种变体 · 凭直觉单选一种 · 同源系统生成可直接拼回主站</p>
+</section>
+
+<script>
+(function(){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced || typeof gsap === 'undefined'){ return; } // 降级: CSS 已呈终态
+  gsap.registerPlugin(ScrollTrigger);
+  const EASE = "power4.out";
+
+  /* 小工具: 把元素文本切成 <span class="char"> (保留空格) */
+  function splitChars(el){
+    const text = el.textContent;
+    el.textContent = "";
+    const frag = document.createDocumentFragment();
+    // 保留已有 span.seal-word 样式: 简单处理——整体重切, 标记词单独着色
+    [...text].forEach(c=>{
+      const s = document.createElement('span');
+      s.className = 'char';
+      s.textContent = c === ' ' ? ' ' : c;
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+    return el.querySelectorAll('.char');
+  }
+
+  /* ---------- VARIANT A: 行级卷帘 ---------- */
+  const vA = document.querySelector('#vA');
+  const aInners = vA.querySelectorAll('.line-mask .inner');
+  gsap.set(aInners, {yPercent:120});
+  const aTL = gsap.timeline({
+    scrollTrigger:{trigger:vA, start:"top 62%"}
+  });
+  aTL.to(aInners, {yPercent:0, duration:1.05, ease:EASE, stagger:0.12});
+  window.__replayA = ()=>{ gsap.set(aInners,{yPercent:120}); aTL.restart(); };
+
+  /* ---------- VARIANT B: 逐字错落 + blur ---------- */
+  const vB = document.querySelector('#vB');
+  let bChars = [];
+  vB.querySelectorAll('[data-split="char"]').forEach(line=>{
+    // 标记词: 切前记录其字符集合, 切后补色
+    const sealText = line.querySelector('.seal-word')?.textContent || "";
+    const chars = splitChars(line);
+    bChars.push(...chars);
+    if(sealText){
+      [...chars].forEach(ch=>{ if(sealText.includes(ch.textContent)) ch.classList.add('seal-word'); });
+    }
+  });
+  gsap.set(bChars, {opacity:0, yPercent:90, filter:"blur(8px)"});
+  const bTL = gsap.timeline({ scrollTrigger:{trigger:vB, start:"top 60%"} });
+  bTL.to(bChars, {opacity:1, yPercent:0, filter:"blur(0px)", duration:.8, ease:"power3.out", stagger:0.018});
+  window.__replayB = ()=>{ gsap.set(bChars,{opacity:0,yPercent:90,filter:"blur(8px)"}); bTL.restart(); };
+
+  /* ---------- VARIANT C: 聚焦显影 ---------- */
+  const vC = document.querySelector('#vC');
+  const cBlock = vC.querySelector('.blur-block');
+  gsap.set(cBlock, {opacity:0, filter:"blur(18px)", scale:1.04, y:18});
+  const cTL = gsap.timeline({ scrollTrigger:{trigger:vC, start:"top 58%"} });
+  cTL.to(cBlock, {opacity:1, filter:"blur(0px)", scale:1, y:0, duration:1.4, ease:"power2.out"});
+  window.__replayC = ()=>{ gsap.set(cBlock,{opacity:0,filter:"blur(18px)",scale:1.04,y:18}); cTL.restart(); };
+
+  /* ---------- VARIANT D: 逐词点亮 (scrub, pinned) ---------- */
+  const vD = document.querySelector('#vD');
+  const qEl = vD.querySelector('[data-ignite]');
+  // 把引言按空格切词, .mark 词高亮成印章红
+  (function buildWords(){
+    const nodes = [...qEl.childNodes];
+    qEl.textContent = "";
+    nodes.forEach(node=>{
+      if(node.nodeType === 3){ // 文本节点
+        node.textContent.trim().split(/\s+/).filter(Boolean).forEach(w=>{
+          const s = document.createElement('span'); s.className='w';
+          s.textContent = w; qEl.appendChild(s); qEl.appendChild(document.createTextNode(' '));
+        });
+      } else { // <span class="mark">
+        const s = document.createElement('span'); s.className='w seal';
+        s.textContent = node.textContent; s.dataset.seal="1";
+        qEl.appendChild(s); qEl.appendChild(document.createTextNode(' '));
+      }
+    });
+  })();
+  const dWords = vD.querySelectorAll('.quote .w');
+  gsap.to(dWords, {
+    color: i => "", // 占位, 用 onUpdate 精确控制
+    duration:1
+  });
+  // 用 scrub 时间线: 每个词依次从 faint 点亮到 ivory / seal
+  const dTL = gsap.timeline({
+    scrollTrigger:{ trigger:vD, start:"top top", end:"bottom bottom", scrub:0.6 }
+  });
+  dWords.forEach(w=>{
+    dTL.to(w, { color: w.dataset.seal ? "#c5402a" : "#efe7d5", duration:1, ease:"none" }, ">-0.5");
+  });
+
+  /* ---------- VARIANT E: 斜切揭幕 clip-path + 视差 ---------- */
+  const vE = document.querySelector('#vE');
+  const eInners = vE.querySelectorAll('.clip-inner');
+  const eRule = vE.querySelector('.gold-rule');
+  gsap.set(eInners, {clipPath:"inset(0 100% 0 0)", xPercent:-4});
+  gsap.set(eRule, {width:0});
+  const eTL = gsap.timeline({ scrollTrigger:{trigger:vE, start:"top 60%"} });
+  eTL.to(eInners, {clipPath:"inset(0 0% 0 0)", xPercent:0, duration:1.2, ease:"power4.inOut", stagger:0.18})
+     .to(eRule, {width:180, duration:.9, ease:"power3.out"}, "-=0.5");
+  // 轻视差: 大字随滚动微移
+  gsap.to(eInners, {
+    yPercent:-8,
+    scrollTrigger:{trigger:vE, start:"top bottom", end:"bottom top", scrub:true}
+  });
+  window.__replayE = ()=>{
+    gsap.set(eInners,{clipPath:"inset(0 100% 0 0)",xPercent:-4});
+    gsap.set(eRule,{width:0}); eTL.restart();
+  };
+
+  /* ---------- 重播按钮 ---------- */
+  document.querySelectorAll('.replay').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const fn = window["__replay"+btn.dataset.replay];
+      if(fn) fn();
+    });
+  });
+})();
+</script>
+</body>
+</html>

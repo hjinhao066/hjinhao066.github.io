@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动效曲线语言 · Lab · 胡晋豪</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14110c; --ink-2:#1b1711; --ink-3:#221d15;
+  --ivory:#efe7d5; --dim:#b1a890; --faint:#7c7260; --line:#2d2618;
+  --seal:#c5402a; --seal-deep:#9b2f1f; --gold:#cda153;
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Jost',sans-serif;
+  --cal:'Ma Shan Zheng',cursive;
+  --hand:'Long Cang',cursive;
+  --zh:'Noto Serif SC',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--ivory);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+/* 纸张噪点叠层 + 暗角，呼应主站 */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;opacity:.5;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(120% 100% at 50% 0%,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+
+.label{font-family:var(--sans);font-weight:500;text-transform:uppercase;letter-spacing:.26em;font-size:11px;color:var(--faint)}
+
+/* ── 顶部 ── */
+header{
+  position:relative;z-index:5;
+  max-width:1180px;margin:0 auto;
+  padding:38px 40px 0;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.back{
+  font-family:var(--sans);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--dim);text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+  transition:color .4s cubic-bezier(.16,1,.3,1);
+}
+.back:hover{color:var(--ivory)}
+.back .arr{display:inline-block;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.back:hover .arr{transform:translateX(-6px)}
+.seal-mark{
+  width:34px;height:34px;background:var(--seal);color:var(--ivory);
+  font-family:var(--cal);font-size:21px;line-height:34px;text-align:center;
+  border-radius:3px;box-shadow:0 2px 14px rgba(197,64,42,.35);
+}
+
+.hero{
+  position:relative;z-index:5;max-width:1180px;margin:0 auto;
+  padding:54px 40px 30px;
+}
+.hero .ko{font-family:var(--hand);font-size:clamp(56px,9vw,120px);color:var(--ivory);line-height:.92;opacity:.96}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4vw,52px);letter-spacing:.01em;margin-top:6px}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero p{font-family:var(--zh);font-weight:300;color:var(--dim);max-width:60ch;margin-top:20px;line-height:1.85;font-size:15px}
+.hero .dim-en{font-family:var(--serif);font-style:italic;color:var(--faint);font-size:18px;margin-top:10px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line) 12%,var(--line) 88%,transparent);max-width:1180px;margin:34px auto 0}
+
+/* ── 变体网格 ── */
+.grid{
+  position:relative;z-index:5;
+  max-width:1180px;margin:0 auto;padding:46px 40px 120px;
+  display:grid;grid-template-columns:repeat(2,1fr);gap:30px;
+}
+@media(max-width:860px){.grid{grid-template-columns:1fr;padding:36px 22px 90px}header,.hero{padding-left:22px;padding-right:22px}}
+
+.card{
+  position:relative;
+  background:linear-gradient(180deg,var(--ink-3),var(--ink-2));
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:26px 26px 30px;
+  overflow:hidden;
+}
+.card::before{ /* 金色细描内框 */
+  content:"";position:absolute;inset:8px;border:1px solid rgba(205,161,83,.14);
+  border-radius:3px;pointer-events:none;
+}
+.card .vtag{
+  display:flex;align-items:baseline;gap:14px;margin-bottom:4px;
+}
+.card .vtag .v{font-family:var(--serif);font-style:italic;font-size:15px;letter-spacing:.04em;color:var(--gold)}
+.card h2{font-family:var(--serif);font-weight:500;font-size:27px;margin:2px 0 0;letter-spacing:.01em}
+.card .src{font-family:var(--sans);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:9px}
+.card .desc{font-family:var(--zh);font-weight:300;font-size:13.5px;color:var(--dim);line-height:1.8;margin-top:13px;min-height:48px}
+.card .meta{font-family:var(--sans);font-size:11px;letter-spacing:.06em;color:var(--faint);margin-top:14px}
+.card .meta code{font-family:'SFMono-Regular',ui-monospace,monospace;font-size:11px;color:var(--gold);background:rgba(205,161,83,.07);padding:2px 7px;border-radius:3px}
+
+/* demo 台面 */
+.stage{
+  position:relative;margin-top:20px;height:150px;
+  background:
+    repeating-linear-gradient(90deg,transparent 0,transparent 11.11%,rgba(177,168,144,.06) 11.11%,rgba(177,168,144,.06) calc(11.11% + 1px)),
+    var(--ink);
+  border:1px solid var(--line);border-radius:4px;overflow:hidden;
+}
+.stage .track{position:absolute;left:24px;right:24px;top:50%;height:1px;background:rgba(177,168,144,.14)}
+.stage .start,.stage .end{position:absolute;top:calc(50% - 9px);width:1px;height:18px;background:rgba(177,168,144,.3)}
+.stage .start{left:24px}.stage .end{right:24px}
+
+/* 被驱动的方块 / 印 */
+.mover{
+  position:absolute;left:24px;top:50%;width:30px;height:30px;margin-top:-15px;
+  background:var(--seal);border-radius:4px;
+  box-shadow:0 4px 18px rgba(197,64,42,.4),inset 0 0 0 1px rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--cal);font-size:18px;color:var(--ivory);will-change:transform;
+}
+.mover.gold{background:linear-gradient(180deg,var(--gold),#a87f37);box-shadow:0 4px 18px rgba(205,161,83,.35)}
+
+.replay{
+  margin-top:18px;display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+  font-family:var(--sans);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);
+  background:none;border:1px solid var(--line);border-radius:3px;padding:9px 16px;
+  transition:border-color .4s,color .4s;
+}
+.replay:hover{border-color:var(--seal);color:var(--ivory)}
+.replay .dot{width:6px;height:6px;border-radius:50%;background:var(--seal)}
+.hint{font-family:var(--sans);font-size:10px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;margin-left:14px}
+
+/* CSS 变体 A：柔和 ease（用 transition + class 切换） */
+.mover-soft{transition:transform 1.05s cubic-bezier(.22,1,.36,1)}
+.stage.run-soft .mover-soft{transform:translateX(var(--span))}
+
+/* CSS 变体 B：overshoot back（cubic-bezier 负值过冲，单弹回） */
+.mover-back{transition:transform 1.1s cubic-bezier(.34,1.56,.64,1)}
+.stage.run-back .mover-back{transform:translateX(var(--span))}
+
+/* CSS 变体 C：spring 弹簧（native linear() 多段衰减，~30 点） */
+@supports (transition-timing-function: linear(0,1)) {
+  .mover-spring{
+    transition:transform 1.25s linear(
+      0,0.006,0.025,0.057,0.101,0.157,0.225,0.303,0.39,0.485,
+      0.586,0.69,0.794,0.896,0.992,1.079,1.154,1.214,1.258,1.285,
+      1.294,1.287,1.265,1.231,1.187,1.137,1.083,1.029,0.978,0.984,
+      1.012,1.006,0.998,1);
+  }
+}
+.stage.run-spring .mover-spring{transform:translateX(var(--span))}
+
+footer{
+  position:relative;z-index:5;max-width:1180px;margin:0 auto;padding:0 40px 70px;
+  font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{transition-duration:.001ms !important;animation-duration:.001ms !important;animation-iteration-count:1 !important}
+  .stage .mover{transform:translateX(var(--span)) !important}
+  .back .arr{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="./index.html"><span class="arr">←</span> Lab Index</a>
+  <div class="seal-mark">胡</div>
+</header>
+
+<section class="hero">
+  <div class="ko">缓动</div>
+  <h1>动效曲线语言 · <em>Easing Personality</em></h1>
+  <div class="dim-en">Same motion, five different physics. Pick the one that feels like the site.</div>
+  <p>同一个动作——一方印从左滑到右——用五条不同的物理阻尼曲线并排重播。柔和、悬停反射、过冲弹回、弹簧衰减、惯性减速。点任意一张卡片重播，对照手感，挑一个能贯穿全站的「动效人格」。</p>
+</section>
+<div class="rule"></div>
+
+<main class="grid">
+
+  <!-- ════════════════ VARIANT A · 柔和 ease ════════════════ -->
+  <article class="card" data-variant="soft">
+    <div class="vtag"><span class="v">Variant A</span></div>
+    <h2>柔和 · Soft Ease</h2>
+    <div class="src">灵感 · Apple / Linear.app · cubic-bezier(.22,1,.36,1)</div>
+    <p class="desc">慢起、长尾、悄然落定。无过冲、无回弹，像宣纸吸墨一样均匀减速。最克制、最东方，适合追求冷峻气质的全站默认手感。</p>
+    <div class="stage" data-stage>
+      <div class="track"></div><span class="start"></span><span class="end"></span>
+      <div class="mover mover-soft">印</div>
+    </div>
+    <div class="meta"><code>cubic-bezier(.22, 1, .36, 1)</code> · 1.05s</div>
+    <button class="replay" data-play="soft"><span class="dot"></span>重播 Replay</button>
+    <span class="hint">点卡片也可重播</span>
+  </article>
+
+  <!-- ════════════════ VARIANT B · overshoot back ════════════════ -->
+  <article class="card" data-variant="back">
+    <div class="vtag"><span class="v">Variant B</span></div>
+    <h2>过冲弹回 · Back</h2>
+    <div class="src">灵感 · Stripe / Framer · cubic-bezier(.34,1.56,.64,1)</div>
+    <p class="desc">冲过终点一点点再收回——控制点 Y 取了 &gt;1 的负张力值，制造单次「啪」的归位。有性格、有弹性，但只弹一下不啰嗦。</p>
+    <div class="stage" data-stage>
+      <div class="track"></div><span class="start"></span><span class="end"></span>
+      <div class="mover mover-back">印</div>
+    </div>
+    <div class="meta"><code>cubic-bezier(.34, 1.56, .64, 1)</code> · 1.1s</div>
+    <button class="replay" data-play="back"><span class="dot"></span>重播 Replay</button>
+    <span class="hint">单次过冲</span>
+  </article>
+
+  <!-- ════════════════ VARIANT C · spring 弹簧 ════════════════ -->
+  <article class="card" data-variant="spring">
+    <div class="vtag"><span class="v">Variant C</span></div>
+    <h2>弹簧衰减 · Spring</h2>
+    <div class="src">灵感 · Josh Comeau / iOS · native CSS linear()</div>
+    <p class="desc">多段衰减振荡，越来越小直至停稳——用原生 <code style="color:var(--gold);background:none;padding:0">linear()</code> 采样约 30 个点近似真实弹簧。活泼、有重量感，是产品感最强的一条，但偏热闹。</p>
+    <div class="stage" data-stage>
+      <div class="track"></div><span class="start"></span><span class="end"></span>
+      <div class="mover mover-spring gold">印</div>
+    </div>
+    <div class="meta"><code>linear(0 … 1.29 … 0.98 … 1)</code> · 1.25s</div>
+    <button class="replay" data-play="spring"><span class="dot"></span>重播 Replay</button>
+    <span class="hint">多次振荡</span>
+  </article>
+
+  <!-- ════════════════ VARIANT D · elastic 橡皮筋 (GSAP) ════════════════ -->
+  <article class="card" data-variant="elastic">
+    <div class="vtag"><span class="v">Variant D</span></div>
+    <h2>橡皮筋 · Elastic</h2>
+    <div class="src">灵感 · Codrops / Awwwards · GSAP elastic.out(1, .35)</div>
+    <p class="desc">先冲到底再被橡皮筋拽回，大幅过冲、来回拉扯后定住。最戏剧化、最抓眼，适合英雄区单点强调，但全站用会过载。GSAP 驱动。</p>
+    <div class="stage" data-stage>
+      <div class="track"></div><span class="start"></span><span class="end"></span>
+      <div class="mover" data-gsap="elastic">印</div>
+    </div>
+    <div class="meta"><code>elastic.out(1, 0.35)</code> · 1.4s · GSAP</div>
+    <button class="replay" data-play="elastic"><span class="dot"></span>重播 Replay</button>
+    <span class="hint">大幅橡皮筋</span>
+  </article>
+
+  <!-- ════════════════ VARIANT E · 惯性减速 (GSAP) ════════════════ -->
+  <article class="card" data-variant="inertia">
+    <div class="vtag"><span class="v">Variant E</span></div>
+    <h2>惯性减速 · Inertia</h2>
+    <div class="src">灵感 · Awwwards 滚动惯性 · GSAP power4.out</div>
+    <p class="desc">瞬间冲出、急速衰减、平滑滑停——无过冲、无回弹，纯粹的高速→静止。有速度感与高级的「丝滑」，最像顺滑滚动与拖拽抛掷的余韵。GSAP 驱动。</p>
+    <div class="stage" data-stage>
+      <div class="track"></div><span class="start"></span><span class="end"></span>
+      <div class="mover gold" data-gsap="inertia">印</div>
+    </div>
+    <div class="meta"><code>power4.out</code> · 1.3s · GSAP</div>
+    <button class="replay" data-play="inertia"><span class="dot"></span>重播 Replay</button>
+    <span class="hint">高速滑停</span>
+  </article>
+
+</main>
+
+<footer>
+  <span>Lab · 动效曲线语言 / Easing</span>
+  <span>5 Variants · Click to compare · 单选其一</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 计算每个 stage 的位移跨度（终点 - 起点 - 方块宽），写入 --span
+  function setSpan(stage){
+    const mover = stage.querySelector('.mover');
+    const span = stage.clientWidth - 24*2 - mover.offsetWidth; // 两侧各 24px padding
+    stage.style.setProperty('--span', span + 'px');
+  }
+  document.querySelectorAll('[data-stage]').forEach(setSpan);
+  window.addEventListener('resize', () => document.querySelectorAll('[data-stage]').forEach(setSpan));
+
+  // ── CSS 变体 (A/B/C) 重播：切到起点 → 强制回流 → 加 run 类 ──
+  function playCSS(card, kind){
+    const stage = card.querySelector('[data-stage]');
+    stage.classList.remove('run-'+kind);
+    void stage.offsetWidth;            // 强制 reflow，确保从 0 重放
+    if(!reduce) stage.classList.add('run-'+kind);
+  }
+
+  // ── GSAP 变体 (D/E) 重播 ──
+  function playGSAP(card, kind){
+    const stage = card.querySelector('[data-stage]');
+    const mover = stage.querySelector('.mover');
+    const span = parseFloat(getComputedStyle(stage).getPropertyValue('--span')) || (stage.clientWidth-78);
+    gsap.killTweensOf(mover);
+    gsap.set(mover, {x:0});
+    if(reduce){ gsap.set(mover, {x:span}); return; }
+    if(kind === 'elastic'){
+      gsap.to(mover, {x:span, duration:1.4, ease:'elastic.out(1, 0.35)'});
+    } else { // inertia
+      gsap.to(mover, {x:span, duration:1.3, ease:'power4.out'});
+    }
+  }
+
+  function play(card){
+    const kind = card.dataset.variant;
+    if(kind === 'elastic' || kind === 'inertia') playGSAP(card, kind);
+    else playCSS(card, kind);
+  }
+
+  // 整张卡片可点重播；按钮单独绑定避免冒泡重复
+  document.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('click', () => play(card));
+    const btn = card.querySelector('.replay');
+    btn.addEventListener('click', e => { e.stopPropagation(); play(card); });
+  });
+
+  // 首次进入：轻微错峰自动播一遍，让用户一眼看到差异
+  if(!reduce){
+    document.querySelectorAll('.card').forEach((card,i)=>{
+      setTimeout(()=>play(card), 420 + i*230);
+    });
+  } else {
+    // 降级：直接落终点
+    document.querySelectorAll('[data-stage]').forEach(s=>{
+      const m=s.querySelector('.mover');
+      m.style.transform = 'translateX(var(--span))';
+    });
+  }
+})();
+</script>
+</body>
+</html>

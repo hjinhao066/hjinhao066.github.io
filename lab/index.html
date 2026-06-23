@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lab · 组件实验室 · 胡锦豪</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23c5402a'/%3E%3Ctext x='32' y='47' font-family='serif' font-weight='700' font-size='40' fill='%23f4ecda' text-anchor='middle'%3E%E8%83%A1%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14110c; --ink-2:#1b1711; --ink-3:#221d15;
+    --ivory:#efe7d5; --dim:#b1a890; --faint:#7c7260; --line:#2d2618;
+    --seal:#c5402a; --seal-deep:#9b2f1f; --gold:#cda153;
+    --serif:'Cormorant Garamond','Noto Serif SC',Georgia,serif;
+    --sans:'Jost','Noto Serif SC',system-ui,sans-serif;
+    --cal:'Ma Shan Zheng',serif; --hand:'Long Cang',cursive,serif;
+    --zh:'Noto Serif SC',serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:var(--sans);background:var(--ink);color:var(--ivory);line-height:1.65;font-size:17px;font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  ::selection{background:var(--seal);color:var(--ivory);}
+  a{color:inherit;text-decoration:none;}
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.045;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 90% at 50% 24%,transparent 55%,rgba(0,0,0,.5) 100%);}
+  .label{font-family:var(--sans);font-weight:500;text-transform:uppercase;letter-spacing:.26em;font-size:11px;color:var(--faint);}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 40px;position:relative;z-index:2;}
+
+  /* top */
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:26px 40px;position:relative;z-index:3;}
+  .topbar .seal{width:34px;height:34px;border-radius:5px;background:var(--seal);display:grid;place-items:center;font-family:var(--cal);color:var(--ivory);font-size:22px;line-height:1;}
+  .topbar a.back{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);transition:color .2s;}
+  .topbar a.back:hover{color:var(--ivory);}
+
+  /* hero */
+  header.head{padding:64px 0 40px;border-bottom:1px solid var(--line);}
+  .kicker{display:flex;align-items:center;gap:16px;margin-bottom:26px;}
+  .kicker .ln{height:1px;width:54px;background:var(--seal);}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(44px,8vw,104px);line-height:.96;letter-spacing:-.01em;}
+  h1 em{font-style:italic;color:var(--gold);}
+  h1 .cn{font-family:var(--hand);color:var(--ivory);font-size:clamp(40px,7vw,92px);letter-spacing:.04em;}
+  .sub{margin-top:30px;max-width:60ch;font-family:var(--zh);font-weight:300;font-size:17px;color:var(--dim);line-height:1.9;}
+  .sub b{color:var(--ivory);font-weight:400;}
+  .sub .s{color:var(--seal);}
+
+  /* method strip */
+  .method{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:42px 0 0;}
+  .method .cell{background:var(--ink);padding:22px 22px 24px;}
+  .method .cell .n{font-family:var(--serif);font-style:italic;font-size:30px;color:var(--seal);}
+  .method .cell .t{margin-top:6px;font-family:var(--zh);font-size:14px;color:var(--dim);line-height:1.7;}
+
+  /* grid of dimensions */
+  .dims{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-top:none;margin-bottom:80px;}
+  .dim{background:var(--ink);padding:34px 34px 30px;display:flex;flex-direction:column;min-height:200px;transition:background .3s;position:relative;}
+  .dim:hover{background:var(--ink-2);}
+  .dim .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;}
+  .dim .idx{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--faint);}
+  .dim .cnt{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);white-space:nowrap;}
+  .dim h3{font-family:var(--zh);font-weight:500;font-size:25px;color:var(--ivory);margin-top:14px;letter-spacing:.01em;}
+  .dim .en{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--faint);margin-top:4px;}
+  .dim p{font-family:var(--zh);font-weight:300;font-size:14px;color:var(--dim);line-height:1.75;margin-top:14px;flex:1;}
+  .dim .go{margin-top:18px;display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ivory);}
+  .dim .go .ar{width:26px;height:1px;background:var(--seal);transition:width .3s;}
+  .dim:hover .go .ar{width:42px;}
+  .dim .stretch{position:absolute;inset:0;}
+
+  footer{border-top:1px solid var(--line);padding:40px 0 70px;}
+  .pick{font-family:var(--zh);font-size:15px;color:var(--dim);line-height:1.9;max-width:62ch;}
+  .pick b{color:var(--gold);font-weight:400;}
+  .pick code{font-family:var(--sans);background:var(--ink-3);color:var(--ivory);padding:2px 9px;border:1px solid var(--line);font-size:13px;letter-spacing:.04em;}
+
+  @media (max-width:760px){
+    .method{grid-template-columns:repeat(2,1fr);}
+    .dims{grid-template-columns:1fr;}
+    .wrap,.topbar{padding-left:24px;padding-right:24px;}
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<nav class="topbar">
+  <div class="seal">胡</div>
+  <a class="back" href="../index.html">← 返回主站</a>
+</nav>
+
+<header class="head">
+  <div class="wrap">
+    <div class="kicker"><span class="ln"></span><span class="label">The Lab · 组件实验室</span></div>
+    <h1><em>The</em> Lab<span class="cn"> 实验室</span></h1>
+    <p class="sub">
+      不直接写整站。借<b>老王的 Lab 方法</b>：把网页拆成细分维度，从 Awwwards / Codrops / CodePen 的<span class="s">获奖动效</span>里把手感抓到本地、用我自己的墨/印章设计系统重绘，每个维度并排出 <b>4–5 个变体</b>。
+      你只做一件事：<b>逐个看，凭直觉单选。</b>选中的代码因为是同一套系统生成的，能 100% 原生拼回主站。
+    </p>
+
+    <div class="method">
+      <div class="cell"><div class="n">01</div><div class="t">抓料：调研获奖站点的特效手感</div></div>
+      <div class="cell"><div class="n">02</div><div class="t">打样：每个维度本地出 4–5 变体</div></div>
+      <div class="cell"><div class="n">03</div><div class="t">单选：你凭眼睛/直觉挑一个</div></div>
+      <div class="cell"><div class="n">04</div><div class="t">拼接：选中的乐高式拼进主站</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="dims">
+
+    <a class="dim" href="./toc-nav.html">
+      <div class="row"><span class="idx">i</span><span class="cnt">5 变体</span></div>
+      <h3>TOC 阅读目录 · 滚动进度</h3>
+      <div class="en">Reading index &amp; scroll progress</div>
+      <p>圆球目录 / 竖排刻度尺 / 编号目录 / 顶部发丝条 / 印章表盘。读到哪亮到哪的 scroll-spy。</p>
+      <span class="go">进实验室 <span class="ar"></span></span>
+    </a>
+
+    <a class="dim" href="./hero.html">
+      <div class="row"><span class="idx">ii</span><span class="cnt">5 变体</span></div>
+      <h3>Hero 首屏处理</h3>
+      <div class="en">The opening frame</div>
+      <p>纵向光幕 / 逐字 mask 入场 / drop-cap 排版 / 颗粒流动 canvas / 视频占位光扫。冷峻克制的开场。</p>
+      <span class="go">进实验室 <span class="ar"></span></span>
+    </a>
+
+    <a class="dim" href="./reveal-text.html">
+      <div class="row"><span class="idx">iii</span><span class="cnt">5 变体</span></div>
+      <h3>文字滚动揭示</h3>
+      <div class="en">Scroll text reveals</div>
+      <p>行级卷帘 / 逐字错落 / 聚焦显影 / 逐词点亮 / 斜切揭幕。滚动驱动的入场语言。</p>
+      <span class="go">进实验室 <span class="ar"></span></span>
+    </a>
+
+    <a class="dim" href="./cursor-hover.html">
+      <div class="row"><span class="idx">iv</span><span class="cnt">5 变体</span></div>
+      <h3>光标与悬停微交互</h3>
+      <div class="en">Cursor &amp; hover</div>
+      <p>磁性按钮 / 淡墨光标 / 反色擦除 / 倾斜视差卡 / 金色流光。指尖的重量感。</p>
+      <span class="go">进实验室 <span class="ar"></span></span>
+    </a>
+
+    <a class="dim" href="./easing.html">
+      <div class="row"><span class="idx">v</span><span class="cnt">5 变体</span></div>
+      <h3>动效曲线语言</h3>
+      <div class="en">Easing &amp; motion feel</div>
+      <p>柔和 / 过冲弹回 / 弹簧衰减 / 橡皮筋 / 惯性减速。同一动作并排对照，挑全站统一的「动效人格」。</p>
+      <span class="go">进实验室 <span class="ar"></span></span>
+    </a>
+
+    <a class="dim" href="./easter-egg.html">
+      <div class="row"><span class="idx">vi</span><span class="cnt">5 变体</span></div>
+      <h3>彩蛋 · 终端 404 / 状态面板</h3>
+      <div class="en">Terminal 404 &amp; now-panel</div>
+      <p>启动报错 / 可输入 shell / NOW 状态面板 / 实时仪表盘 / 全屏 kernel panic。匠气与极客感。</p>
+      <span class="go">进实验室 <span class="ar"></span></span>
+    </a>
+
+    <a class="dim" href="./transitions.html">
+      <div class="row"><span class="idx">vii</span><span class="cnt">5 变体</span></div>
+      <h3>页面 / 图片转场</h3>
+      <div class="en">Page &amp; image transitions</div>
+      <p>卷帘 / 百叶 / 墨晕 ink-bleed / 颗粒溶解 / 章节幕布。画轴被另一卷顶替的换场手感。</p>
+      <span class="go">进实验室 <span class="ar"></span></span>
+    </a>
+
+    <div class="dim" style="background:var(--ink-3);">
+      <div class="row"><span class="idx">∑</span><span class="cnt" style="color:var(--gold)">7 维度 · 35 变体</span></div>
+      <h3 style="color:var(--gold)">怎么选给我</h3>
+      <div class="en">How to hand me your picks</div>
+      <p style="color:var(--dim)">逐个页面看完，按维度告诉我一句话即可，例如：<br><span style="color:var(--ivory)">「TOC 选 A，Hero 选 D，转场选墨晕，动效统一用柔和」</span>。我把选中的拼进主站，出下一版。</p>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="pick">
+      <b>玩法说明：</b>每个维度页里 4–5 个变体都是<b>真实可交互的活 demo</b>（能滚、能 hover、能点），不是截图。
+      看完后把你的单选发我：<code>维度 → 变体字母/名字</code>。
+      没感觉的维度可以先跳过，保留主站现状。
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

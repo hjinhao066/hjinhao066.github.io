@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab · 页面与图片转场</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ============================================================
+   设计系统 — 墨 / 印章
+   ============================================================ */
+:root{
+  --ink:#14110c; --ink-2:#1b1711; --ink-3:#221d15;
+  --ivory:#efe7d5; --dim:#b1a890; --faint:#7c7260; --line:#2d2618;
+  --seal:#c5402a; --seal-deep:#9b2f1f; --gold:#cda153;
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Jost',sans-serif;
+  --cal:'Ma Shan Zheng',cursive;
+  --hand:'Long Cang',cursive;
+  --zh:'Noto Serif SC',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--ivory);
+  font-family:var(--serif);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* 纸张噪点叠层 + 暗角 (全局, z-index:1, 不拦截指针) */
+body::before{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+.label{
+  font-family:var(--sans);font-weight:500;text-transform:uppercase;
+  letter-spacing:.26em;font-size:11px;color:var(--faint);
+}
+
+/* ---- 顶栏 ---- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 36px;
+  background:linear-gradient(to bottom,rgba(20,17,12,.96),rgba(20,17,12,.7) 70%,transparent);
+  backdrop-filter:blur(2px);
+}
+.topbar a.back{
+  font-family:var(--sans);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--dim);text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+  transition:color .4s;
+}
+.topbar a.back:hover{color:var(--ivory)}
+.topbar a.back::before{content:"←";color:var(--seal);font-size:15px}
+.topbar .dim-title{
+  font-family:var(--sans);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint);
+}
+
+/* ---- 引子 ---- */
+.intro{
+  position:relative;z-index:2;
+  padding:90px 36px 40px;max-width:980px;margin:0 auto;text-align:center;
+}
+.intro .seal-mark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:48px;height:48px;background:var(--seal);color:var(--ivory);
+  font-family:var(--cal);font-size:26px;border-radius:3px;margin-bottom:26px;
+  box-shadow:0 6px 24px rgba(155,47,31,.4);
+}
+.intro h1{
+  font-size:clamp(40px,7vw,82px);font-weight:300;line-height:1.04;letter-spacing:.01em;
+}
+.intro h1 .zh{font-family:var(--zh);font-weight:400}
+.intro p.sub{
+  font-family:var(--zh);font-weight:300;color:var(--dim);
+  font-size:16px;line-height:1.9;max-width:560px;margin:24px auto 0;
+}
+
+/* ---- 区段框架 ---- */
+.variant{
+  position:relative;z-index:2;
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:120px 7vw;
+  border-top:1px solid var(--line);
+  overflow:hidden;
+}
+.variant .vtag{
+  position:absolute;top:46px;left:7vw;z-index:6;
+  display:flex;align-items:baseline;gap:16px;
+}
+.variant .vtag .vbig{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:30px;color:var(--seal);line-height:1;
+}
+.variant .vtag .vname{
+  font-family:var(--sans);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--dim);
+}
+.variant .vnote{
+  position:absolute;top:46px;right:7vw;max-width:310px;text-align:right;z-index:6;
+}
+.variant .vnote .feel{
+  font-family:var(--zh);font-weight:300;font-size:13px;color:var(--dim);line-height:1.8;
+}
+.variant .vnote .src{
+  display:block;margin-top:8px;
+  font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);
+}
+.variant .vnote .src::before{content:"灵感 · ";color:var(--gold)}
+
+/* 重播按钮 */
+.replay{
+  position:absolute;bottom:40px;left:7vw;z-index:7;
+  font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--faint);background:none;border:1px solid var(--line);
+  padding:8px 16px;border-radius:2px;cursor:pointer;transition:all .4s;
+}
+.replay:hover{color:var(--ivory);border-color:var(--seal)}
+
+/* ============================================================
+   公共：图片占位（无外部依赖，用本系统色 + 噪点织造一张"墨景图"）
+   每个 .ink-photo 是一块可揭幕的图面
+   ============================================================ */
+.ink-photo{
+  position:relative;width:100%;height:100%;
+  background:
+    radial-gradient(120% 90% at 70% 20%, rgba(197,64,42,.22), transparent 55%),
+    radial-gradient(90% 80% at 20% 80%, rgba(205,161,83,.16), transparent 60%),
+    linear-gradient(160deg, #241d13 0%, #14110c 60%, #0d0b07 100%);
+  overflow:hidden;
+}
+.ink-photo::before{ /* 山影 */
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(60% 40% at 30% 100%, rgba(0,0,0,.5), transparent 70%),
+    radial-gradient(50% 36% at 78% 100%, rgba(0,0,0,.6), transparent 72%);
+}
+.ink-photo .pmark{ /* 图上的行书字，做画面焦点 */
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--hand);font-size:clamp(80px,16vw,200px);color:rgba(239,231,213,.9);
+  text-shadow:0 8px 40px rgba(0,0,0,.6);
+}
+.ink-photo .pseal{ /* 角上印章 */
+  position:absolute;right:7%;bottom:8%;
+  width:clamp(40px,5vw,64px);aspect-ratio:1;background:var(--seal);
+  display:flex;align-items:center;justify-content:center;border-radius:3px;
+  font-family:var(--cal);color:var(--ivory);font-size:clamp(22px,2.6vw,32px);
+  box-shadow:0 6px 24px rgba(155,47,31,.45);
+}
+
+/* ============================================================
+   VARIANT A — 卷帘 wipe（双图 clip-path 直切交叠）
+   ============================================================ */
+#vA .stage{position:relative;width:100%;max-width:1100px;height:62vh;margin:0 auto;border:1px solid var(--line)}
+#vA .layer{position:absolute;inset:0}
+#vA .layer.top{clip-path:inset(0 0 0 100%)} /* 上层从右侧滑入 */
+#vA .seam{ /* 卷帘缝处的金线 */
+  position:absolute;top:0;bottom:0;width:2px;left:0;
+  background:linear-gradient(var(--gold),rgba(205,161,83,.2));
+  box-shadow:0 0 18px rgba(205,161,83,.6);opacity:0;
+}
+#vA .ctrl{display:flex;gap:14px;justify-content:center;margin-top:26px}
+#vA .ctrl button{
+  font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim);background:none;border:1px solid var(--line);padding:10px 20px;
+  border-radius:2px;cursor:pointer;transition:all .35s;
+}
+#vA .ctrl button:hover,#vA .ctrl button.on{color:var(--ivory);border-color:var(--seal)}
+
+/* ============================================================
+   VARIANT B — 多扇百叶 / blinds 揭幕（滚动 scrub 驱动）
+   ============================================================ */
+#vB .stage{position:relative;width:100%;max-width:1100px;height:64vh;margin:0 auto;border:1px solid var(--line)}
+#vB .photo-wrap{position:absolute;inset:0}
+#vB .blinds{position:absolute;inset:0;display:flex;pointer-events:none}
+#vB .blind{flex:1;background:var(--ink);border-right:1px solid rgba(45,38,24,.6);transform-origin:top}
+#vB .blind:last-child{border-right:none}
+#vB .scrollhint{
+  text-align:center;margin-top:24px;font-family:var(--sans);font-size:10px;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--faint);
+}
+
+/* ============================================================
+   VARIANT C — 墨水扩散 ink-bleed（SVG turbulence 遮罩，圆心溢开）
+   ============================================================ */
+#vC .stage{position:relative;width:100%;max-width:1100px;height:64vh;margin:0 auto;border:1px solid var(--line);cursor:crosshair}
+#vC .photo-wrap{
+  position:absolute;inset:0;
+  /* 用 radial 遮罩 + SVG 位移滤镜做毛边墨晕 */
+  -webkit-mask:radial-gradient(circle at var(--mx,50%) var(--my,55%),#000 0%,#000 var(--r,0%),transparent calc(var(--r,0%) + 9%));
+  mask:radial-gradient(circle at var(--mx,50%) var(--my,55%),#000 0%,#000 var(--r,0%),transparent calc(var(--r,0%) + 9%));
+  filter:url(#inkTurb);
+}
+#vC .ink-cap{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+  font-family:var(--zh);font-weight:300;font-size:12px;color:var(--dim);letter-spacing:.08em}
+
+/* ============================================================
+   VARIANT D — 像素/噪点溶解 dissolve（颗粒网格 stagger 消散）
+   ============================================================ */
+#vD .stage{position:relative;width:100%;max-width:1100px;height:62vh;margin:0 auto;border:1px solid var(--line)}
+#vD .photo-wrap{position:absolute;inset:0}
+#vD .grid{position:absolute;inset:0;display:grid;pointer-events:none}
+#vD .cell{background:var(--ink)}
+#vD .ctrl{display:flex;gap:14px;justify-content:center;margin-top:26px}
+#vD .ctrl button{
+  font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim);background:none;border:1px solid var(--line);padding:10px 20px;
+  border-radius:2px;cursor:pointer;transition:all .35s;
+}
+#vD .ctrl button:hover{color:var(--ivory);border-color:var(--seal)}
+
+/* ============================================================
+   VARIANT E — 章节幕布 curtain（整屏色块上掩，barba 风路由视觉）
+   ============================================================ */
+#vE{padding:0;min-height:auto}
+#vE .e-frame{position:relative;width:100%;max-width:1200px;margin:0 auto;padding:120px 7vw}
+#vE .pages{position:relative;width:100%;height:60vh;border:1px solid var(--line);overflow:hidden}
+#vE .page{position:absolute;inset:0;opacity:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+#vE .page.live{opacity:1}
+#vE .page h3{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(40px,6vw,72px)}
+#vE .page .pz{font-family:var(--zh);color:var(--dim);font-size:14px;letter-spacing:.18em;margin-top:14px}
+/* 幕布：一上一下两片，从中缝合拢再退场 */
+#vE .curtain{position:absolute;left:0;right:0;height:50%;background:var(--seal);z-index:8;transform:scaleY(0);pointer-events:none}
+#vE .curtain.top{top:0;transform-origin:top}
+#vE .curtain.bot{bottom:0;transform-origin:bottom}
+#vE .curtain .seal-glyph{position:absolute;left:50%;font-family:var(--cal);color:var(--ivory);font-size:40px;opacity:0}
+#vE .curtain.top .seal-glyph{bottom:-26px;transform:translateX(-50%)}
+#vE .curtain.bot .seal-glyph{top:-26px;transform:translateX(-50%)}
+#vE .e-nav{display:flex;gap:14px;justify-content:center;margin-top:30px}
+#vE .e-nav button{
+  font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim);background:none;border:1px solid var(--line);padding:11px 22px;
+  border-radius:2px;cursor:pointer;transition:all .35s;
+}
+#vE .e-nav button:hover,#vE .e-nav button.on{color:var(--ivory);border-color:var(--seal)}
+
+/* ---- 页脚 ---- */
+.footer{position:relative;z-index:2;text-align:center;padding:80px 20px 60px;border-top:1px solid var(--line)}
+.footer .label{display:block}
+
+/* ============================================================
+   无障碍：减少动态 — 全部直接揭幕到终态，关闭过渡
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  #vA .layer.top{clip-path:inset(0)}
+  #vB .blind,#vD .cell{display:none}
+  #vC .photo-wrap{-webkit-mask:none;mask:none;filter:none}
+  #vE .page{opacity:1}
+  #vE .curtain{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- SVG 滤镜：墨晕毛边（供 Variant C 引用） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="inkTurb">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<header class="topbar">
+  <a class="back" href="./index.html">返回 Lab</a>
+  <span class="dim-title">Dimension · Page &amp; Image Transitions</span>
+</header>
+
+<section class="intro">
+  <span class="seal-mark">幕</span>
+  <h1>页面与图片<span class="zh"> 转场</span></h1>
+  <p class="sub">五种揭幕手感打样：卷帘、百叶、墨晕、颗粒溶解、章节幕布。各自局部封闭，可单选后原生拼入主站。</p>
+</section>
+
+<!-- ============================================================
+     VARIANT A — 卷帘 WIPE
+     ============================================================ -->
+<section class="variant" id="vA">
+  <div class="vtag"><span class="vbig">A</span><span class="vname">卷帘 Wipe</span></div>
+  <div class="vnote">
+    <p class="feel">两幅图以 clip-path inset 硬边对切，缝口走一道金线，像一卷画轴被另一卷顶替。干脆、有重量。</p>
+    <span class="src">Awwwards · clip-path wipe SOTD</span>
+  </div>
+  <div class="stage">
+    <div class="layer bottom"><div class="ink-photo"><div class="pmark">山</div><div class="pseal">壹</div></div></div>
+    <div class="layer top"><div class="ink-photo" style="filter:hue-rotate(-12deg) brightness(1.05)"><div class="pmark">海</div><div class="pseal">贰</div></div></div>
+    <div class="seam"></div>
+  </div>
+  <div class="ctrl">
+    <button data-to="0" class="on">山</button>
+    <button data-to="1">海</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     VARIANT B — 百叶 BLINDS（滚动 scrub）
+     ============================================================ -->
+<section class="variant" id="vB">
+  <div class="vtag"><span class="vbig">B</span><span class="vname">百叶 Blinds</span></div>
+  <div class="vnote">
+    <p class="feel">八扇竖向叶片随滚动逐条翻开，图像分段浮现。节奏由你的滚轮掌控，停在哪揭到哪。</p>
+    <span class="src">Awwwards · scroll-blinds reveal</span>
+  </div>
+  <div class="stage">
+    <div class="photo-wrap"><div class="ink-photo"><div class="pmark">竹</div><div class="pseal">叁</div></div></div>
+    <div class="blinds" id="bBlinds"></div>
+  </div>
+  <p class="scrollhint">↓ 向下滚动揭幕 ↓</p>
+</section>
+
+<!-- ============================================================
+     VARIANT C — 墨水扩散 INK-BLEED
+     ============================================================ -->
+<section class="variant" id="vC">
+  <div class="vtag"><span class="vbig">C</span><span class="vname">墨晕 Ink-bleed</span></div>
+  <div class="vnote">
+    <p class="feel">圆形遮罩配 turbulence 位移，边缘成毛边墨晕，从落笔点向外洇开。鼠标移动即落点，进入区域自动晕染。</p>
+    <span class="src">Codrops · SVG mask + displacement</span>
+  </div>
+  <div class="stage" id="cStage">
+    <div class="photo-wrap"><div class="ink-photo" style="filter:hue-rotate(8deg)"><div class="pmark">墨</div><div class="pseal">肆</div></div></div>
+    <span class="ink-cap">移动鼠标 — 墨随笔走</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     VARIANT D — 颗粒溶解 DISSOLVE
+     ============================================================ -->
+<section class="variant" id="vD">
+  <div class="vtag"><span class="vbig">D</span><span class="vname">颗粒溶解 Dissolve</span></div>
+  <div class="vnote">
+    <p class="feel">图面铺一层墨色方格，按伪随机次序逐格淡出，像旧底片在显影液里慢慢现形。颗粒感强、有时间味。</p>
+    <span class="src">Codrops · block-reveal w/ noise</span>
+  </div>
+  <div class="stage">
+    <div class="photo-wrap"><div class="ink-photo" style="filter:contrast(1.05)"><div class="pmark">隐</div><div class="pseal">伍</div></div></div>
+    <div class="grid" id="dGrid"></div>
+  </div>
+  <div class="ctrl">
+    <button id="dReplay">重新显影</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     VARIANT E — 章节幕布 CURTAIN（barba 视觉演示）
+     ============================================================ -->
+<section class="variant" id="vE">
+  <div class="vtag"><span class="vbig">E</span><span class="vname">章节幕布 Curtain</span></div>
+  <div class="vnote">
+    <p class="feel">切章时印章红幕从上下合拢、亮起一枚「换」字、再退场露出新页。barba.js 式整页路由的视觉手感，无需真路由。</p>
+    <span class="src">Awwwards · barba page-transition</span>
+  </div>
+  <div class="e-frame">
+    <div class="pages" id="ePages">
+      <div class="page live"><h3>之一 · 序</h3><span class="pz">起手 · 留白处见笔意</span></div>
+      <div class="page"><h3>之二 · 山</h3><span class="pz">远岫含烟 · 一抹横陈</span></div>
+      <div class="page"><h3>之三 · 印</h3><span class="pz">朱痕一方 · 落款收束</span></div>
+    </div>
+    <div class="curtain top"><span class="seal-glyph">换</span></div>
+    <div class="curtain bot"><span class="seal-glyph">换</span></div>
+    <div class="e-nav">
+      <button data-pg="0" class="on">序</button>
+      <button data-pg="1">山</button>
+      <button data-pg="2">印</button>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <span class="label">Hu Jinhao · Lab · Transitions</span>
+</footer>
+
+<script>
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ============================================================
+     VARIANT A — 卷帘 wipe：clip-path inset 硬边对切 + 金缝
+     ============================================================ */
+  (function(){
+    const vA = document.querySelector('#vA');
+    const top = vA.querySelector('.layer.top');
+    const seam = vA.querySelector('.seam');
+    const btns = vA.querySelectorAll('.ctrl button');
+    let state = 0; // 0=山(底层), 1=海(顶层)
+    function go(to){
+      if(to===state) return; state = to;
+      btns.forEach((b,i)=>b.classList.toggle('on', i===to));
+      if(reduce){ gsap.set(top,{clipPath: to? 'inset(0)':'inset(0 0 0 100%)'}); return; }
+      const tl = gsap.timeline();
+      // 金缝先扫过，制造"卷轴推进"的物理边
+      gsap.set(seam,{opacity:1, left: to? '100%':'0%'});
+      tl.to(top,{clipPath: to? 'inset(0 0 0 0%)':'inset(0 0 0 100%)', duration:1.0, ease:'power4.inOut'},0)
+        .fromTo(seam,{left: to?'0%':'100%'},{left: to?'100%':'0%', duration:1.0, ease:'power4.inOut'},0)
+        .to(seam,{opacity:0, duration:.4},'-=0.25');
+    }
+    btns.forEach((b,i)=>b.addEventListener('click',()=>go(i)));
+  })();
+
+  /* ============================================================
+     VARIANT B — 百叶 blinds：8 扇叶片 scrub 翻开
+     ============================================================ */
+  (function(){
+    const wrap = document.querySelector('#bBlinds');
+    const N = 8;
+    for(let i=0;i<N;i++){ const d=document.createElement('div'); d.className='blind'; wrap.appendChild(d); }
+    const blinds = wrap.querySelectorAll('.blind');
+    if(reduce){ gsap.set(blinds,{scaleY:0}); return; }
+    gsap.set(blinds,{scaleY:1});
+    gsap.to(blinds,{
+      scaleY:0, ease:'none', stagger:{each:0.06, from:'edges'},
+      scrollTrigger:{ trigger:'#vB', start:'top 70%', end:'center 40%', scrub:0.5 }
+    });
+  })();
+
+  /* ============================================================
+     VARIANT C — 墨晕 ink-bleed：进入晕开 + 鼠标定落点
+     ============================================================ */
+  (function(){
+    const stage = document.querySelector('#cStage');
+    const wrap = stage.querySelector('.photo-wrap');
+    if(reduce){ wrap.style.webkitMask='none'; wrap.style.mask='none'; return; }
+    const obj = {r:0};
+    gsap.set(wrap,{'--mx':'50%','--my':'55%'});
+    const reveal = gsap.to(obj,{
+      r:150, duration:1.6, ease:'power2.out', paused:true,
+      onUpdate:()=>wrap.style.setProperty('--r', obj.r+'%')
+    });
+    ScrollTrigger.create({ trigger:'#vC', start:'top 60%', once:true, onEnter:()=>reveal.play() });
+    stage.addEventListener('pointermove',e=>{
+      const rc = stage.getBoundingClientRect();
+      const x = (e.clientX-rc.left)/rc.width*100;
+      const y = (e.clientY-rc.top)/rc.height*100;
+      gsap.to(wrap,{'--mx':x+'%','--my':y+'%', duration:.6, ease:'power2.out'});
+    });
+  })();
+
+  /* ============================================================
+     VARIANT D — 颗粒溶解 dissolve：网格逐格淡出
+     ============================================================ */
+  (function(){
+    const grid = document.querySelector('#dGrid');
+    const COLS=20, ROWS=12, total=COLS*ROWS;
+    grid.style.gridTemplateColumns=`repeat(${COLS},1fr)`;
+    grid.style.gridTemplateRows=`repeat(${ROWS},1fr)`;
+    const cells=[];
+    for(let i=0;i<total;i++){ const c=document.createElement('div'); c.className='cell'; grid.appendChild(c); cells.push(c); }
+    if(reduce){ gsap.set(cells,{opacity:0}); return; }
+    // 伪随机次序：每格一个随机延迟权重
+    function shuffled(){ return cells.map(c=>({c,k:Math.random()})).sort((a,b)=>a.k-b.k).map(o=>o.c); }
+    function dissolve(){
+      gsap.set(cells,{opacity:1});
+      gsap.to(shuffled(),{opacity:0, duration:.35, ease:'power1.out', stagger:{each:0.006, from:'start'}});
+    }
+    ScrollTrigger.create({ trigger:'#vD', start:'top 60%', once:true, onEnter:dissolve });
+    document.querySelector('#dReplay').addEventListener('click',dissolve);
+  })();
+
+  /* ============================================================
+     VARIANT E — 章节幕布 curtain：上下合拢 → 切页 → 退场
+     ============================================================ */
+  (function(){
+    const pages = document.querySelectorAll('#vE .page');
+    const cTop = document.querySelector('#vE .curtain.top');
+    const cBot = document.querySelector('#vE .curtain.bot');
+    const glyphs = document.querySelectorAll('#vE .curtain .seal-glyph');
+    const btns = document.querySelectorAll('#vE .e-nav button');
+    let cur=0, busy=false;
+    function show(idx){ pages.forEach((p,i)=>p.classList.toggle('live', i===idx)); }
+    function go(to){
+      if(busy||to===cur) return; busy=true;
+      btns.forEach((b,i)=>b.classList.toggle('on', i===to));
+      if(reduce){ show(to); cur=to; busy=false; return; }
+      const tl = gsap.timeline({onComplete:()=>{ busy=false; }});
+      // 合拢
+      tl.to([cTop,cBot],{scaleY:1, duration:.55, ease:'power3.inOut'})
+        .to(glyphs,{opacity:1, duration:.25, ease:'power2.out'},'-=0.2')
+        // 幕后切页
+        .add(()=>{ show(to); cur=to; })
+        .to(glyphs,{opacity:0, duration:.25, ease:'power2.in'},'+=0.15')
+        // 退场
+        .to([cTop,cBot],{scaleY:0, duration:.6, ease:'power3.inOut'},'-=0.05');
+    }
+    btns.forEach((b,i)=>b.addEventListener('click',()=>go(i)));
+  })();
+})();
+</script>
+</body>
+</html>

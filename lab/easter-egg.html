@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab · 彩蛋: 终端 404 / 状态面板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ============ 设计系统变量 ============ */
+:root{
+  --ink:#14110c; --ink-2:#1b1711; --ink-3:#221d15;
+  --ivory:#efe7d5; --dim:#b1a890; --faint:#7c7260; --line:#2d2618;
+  --seal:#c5402a; --seal-deep:#9b2f1f; --gold:#cda153;
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Jost',sans-serif;
+  --cal:'Ma Shan Zheng',cursive;
+  --hand:'Long Cang',cursive;
+  --zh:'Noto Serif SC',serif;
+  /* 终端等宽体: 系统 mono 栈, 保证极客质感 */
+  --mono:'SF Mono',ui-monospace,'JetBrains Mono','Cascadia Code',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--ivory);
+  font-family:var(--sans);font-weight:300;
+  -webkit-font-smoothing:antialiased;
+  padding:0 0 120px;position:relative;overflow-x:hidden;
+}
+/* 纸张噪点叠层 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* 暗角 */
+body::after{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+.wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:0 32px}
+
+/* ============ 顶部导航 ============ */
+.lab-top{display:flex;align-items:baseline;justify-content:space-between;
+  padding:40px 0 28px;border-bottom:1px solid var(--line);margin-bottom:64px;flex-wrap:wrap;gap:18px}
+.lab-back{font-family:var(--sans);font-weight:500;text-transform:uppercase;
+  letter-spacing:.26em;font-size:11px;color:var(--faint);text-decoration:none;
+  display:inline-flex;align-items:center;gap:10px;transition:color .4s}
+.lab-back:hover{color:var(--seal)}
+.lab-back::before{content:"←";font-size:14px}
+.lab-title{text-align:right}
+.lab-title .zh{font-family:var(--cal);font-size:26px;color:var(--ivory);letter-spacing:.08em}
+.lab-title .en{display:block;font-family:var(--sans);font-weight:500;text-transform:uppercase;
+  letter-spacing:.26em;font-size:10px;color:var(--faint);margin-top:6px}
+
+/* ============ 变体区块通用 ============ */
+.label{font-family:var(--sans);font-weight:500;text-transform:uppercase;
+  letter-spacing:.26em;font-size:11px;color:var(--faint)}
+.variant{margin-bottom:96px}
+.variant-head{display:flex;align-items:baseline;gap:18px;margin-bottom:22px;flex-wrap:wrap}
+.variant-tag{font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.18em;
+  color:var(--ink);background:var(--gold);padding:5px 11px;border-radius:1px;text-transform:uppercase}
+.variant-tag.seal{background:var(--seal);color:var(--ivory)}
+.variant-name{font-family:var(--serif);font-size:26px;font-style:italic;font-weight:400;color:var(--ivory)}
+.variant-desc{font-family:var(--sans);font-weight:300;font-size:13px;letter-spacing:.04em;
+  color:var(--dim);max-width:640px;line-height:1.7;margin-top:2px}
+.variant-desc b{color:var(--gold);font-weight:400}
+.variant-src{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.04em}
+
+/* 每个 demo 的外框: 金色细描边 */
+.demo{position:relative;border:1px solid var(--line);background:var(--ink-2);
+  border-radius:2px;overflow:hidden}
+.demo .corner{position:absolute;width:14px;height:14px;border:1px solid var(--gold);opacity:.5;z-index:3}
+.demo .corner.tl{top:8px;left:8px;border-right:0;border-bottom:0}
+.demo .corner.tr{top:8px;right:8px;border-left:0;border-bottom:0}
+.demo .corner.bl{bottom:8px;left:8px;border-right:0;border-top:0}
+.demo .corner.br{bottom:8px;right:8px;border-left:0;border-top:0}
+
+/* ============ 终端通用样式 ============ */
+.term-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;
+  background:var(--ink-3);border-bottom:1px solid var(--line)}
+.term-dot{width:11px;height:11px;border-radius:50%;background:var(--line)}
+.term-dot.r{background:var(--seal)}.term-dot.y{background:var(--gold)}.term-dot.g{background:#6f7a4a}
+.term-bar .tt{margin-left:10px;font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.08em}
+.term-body{font-family:var(--mono);font-size:13.5px;line-height:1.85;padding:22px 22px 26px;
+  color:var(--dim);min-height:300px}
+.term-body .ok{color:#7e8a52}
+.term-body .err{color:var(--seal)}
+.term-body .warn{color:var(--gold)}
+.term-body .iv{color:var(--ivory)}
+.term-body .ft{color:var(--faint)}
+.prompt-user{color:var(--gold)}
+.prompt-host{color:var(--dim)}
+.prompt-path{color:var(--seal)}
+/* 光标 */
+.cursor{display:inline-block;width:8px;height:15px;background:var(--ivory);
+  vertical-align:-2px;margin-left:2px;animation:blink 1.05s step-end infinite}
+.cursor.bar{width:2px}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+/* ============ VARIANT A: 启动报错 404 ============ */
+#vA .term-body{min-height:330px}
+#vA .ln{opacity:0}
+
+/* ============ VARIANT B: 可输入交互 404 ============ */
+#vB .term-body{cursor:text;min-height:340px}
+#vB .out-line{white-space:pre-wrap}
+#vB .input-line{display:flex;align-items:baseline}
+#vB .input-line .pfx{white-space:nowrap;margin-right:6px}
+#vB .typed{color:var(--ivory);min-height:1em;outline:none}
+#vB .hint{color:var(--faint);font-size:11.5px;margin-top:14px;letter-spacing:.05em}
+#vB .cmd{color:var(--gold)}
+
+/* ============ VARIANT C: NOW 状态面板 + 黑白区块 ============ */
+#vC .panel{display:grid;grid-template-columns:1.1fr .9fr;min-height:360px}
+@media(max-width:720px){#vC .panel{grid-template-columns:1fr}}
+#vC .now-list{padding:34px 34px 30px;border-right:1px solid var(--line)}
+@media(max-width:720px){#vC .now-list{border-right:0;border-bottom:1px solid var(--line)}}
+#vC .now-head{display:flex;align-items:center;gap:12px;margin-bottom:30px}
+#vC .now-head .dot{width:7px;height:7px;border-radius:50%;background:var(--seal);
+  box-shadow:0 0 0 0 rgba(197,64,42,.5);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(197,64,42,.5)}70%{box-shadow:0 0 0 9px rgba(197,64,42,0)}100%{box-shadow:0 0 0 0 rgba(197,64,42,0)}}
+#vC .now-row{padding:18px 0;border-top:1px solid var(--line)}
+#vC .now-row:first-of-type{border-top:0}
+#vC .now-row .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+#vC .now-row .v{font-family:var(--serif);font-size:21px;font-style:italic;color:var(--ivory);
+  line-height:1.35;min-height:1.4em;transition:opacity .5s}
+#vC .now-row .meta{font-family:var(--sans);font-size:11px;letter-spacing:.1em;color:var(--dim);margin-top:7px}
+#vC .now-block{position:relative;background:var(--ivory);overflow:hidden}
+#vC .now-block .grid{position:absolute;inset:0;
+  background-image:linear-gradient(var(--ink) 1px,transparent 1px),linear-gradient(90deg,var(--ink) 1px,transparent 1px);
+  background-size:34px 34px;opacity:.08}
+#vC .now-block .big{position:absolute;font-family:var(--hand);color:var(--ink);
+  font-size:140px;line-height:1;transition:opacity .6s,transform .9s cubic-bezier(.16,1,.3,1)}
+#vC .now-block .stamp{position:absolute;bottom:22px;right:24px;font-family:var(--cal);
+  font-size:15px;color:var(--seal);writing-mode:vertical-rl;letter-spacing:.1em;
+  border:1px solid var(--seal);padding:10px 5px}
+#vC .prog{position:absolute;left:0;bottom:0;height:2px;background:var(--seal);width:0}
+
+/* ============ VARIANT D: Live 仪表盘 widgets ============ */
+#vD .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+@media(max-width:720px){#vD .grid4{grid-template-columns:repeat(2,1fr)}}
+#vD .cell{background:var(--ink-2);padding:26px 22px 24px;min-height:158px;position:relative}
+#vD .cell .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+#vD .cell .big{font-family:var(--mono);font-weight:500;font-size:34px;color:var(--ivory);
+  margin-top:14px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+#vD .cell .sub{font-family:var(--sans);font-size:11px;letter-spacing:.08em;color:var(--dim);margin-top:8px}
+#vD .cell .seal-n{color:var(--seal)}
+#vD .cell .gold-n{color:var(--gold)}
+#vD .spark{display:flex;align-items:flex-end;gap:3px;height:30px;margin-top:14px}
+#vD .spark i{flex:1;background:var(--seal);opacity:.7;border-radius:1px;transition:height .5s ease}
+#vD .barwrap{margin-top:16px;height:5px;background:var(--ink);border-radius:3px;overflow:hidden}
+#vD .barwrap b{display:block;height:100%;background:linear-gradient(90deg,var(--seal-deep),var(--gold));width:0}
+
+/* ============ VARIANT E: 全屏沉浸 404 (BSD kernel panic 风) ============ */
+#vE .demo{background:var(--ink)}
+#vE .panic{font-family:var(--mono);padding:30px 26px;min-height:400px;
+  font-size:13px;line-height:1.95;position:relative}
+#vE .panic .scan{position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,.18) 3px,rgba(0,0,0,0) 4px);
+  mix-blend-mode:overlay;opacity:.6}
+#vE .glow{text-shadow:0 0 7px rgba(197,64,42,.35)}
+#vE .ascii{color:var(--seal);font-size:12px;line-height:1.25;white-space:pre;margin-bottom:18px;
+  text-shadow:0 0 9px rgba(197,64,42,.4)}
+#vE .big404{font-family:var(--hand);font-size:84px;color:var(--ivory);line-height:1;
+  margin:8px 0 4px;text-shadow:0 0 14px rgba(239,231,213,.18)}
+#vE .reboot{margin-top:22px;color:var(--gold)}
+#vE .barline{display:inline-block;width:160px;height:9px;border:1px solid var(--faint);
+  vertical-align:middle;margin-left:10px;position:relative;border-radius:1px}
+#vE .barline b{position:absolute;inset:1px;width:0;background:var(--gold);border-radius:1px}
+
+/* 选用提示条 */
+.pick{margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--faint);
+  display:flex;align-items:center;gap:8px}
+.pick::before{content:"▸";color:var(--seal)}
+
+/* 降级: 关掉动画 */
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+  .cursor{opacity:1}
+  #vA .ln{opacity:1!important}
+  #vD .barwrap b,#vC .prog{width:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ 顶部导航 ============ -->
+  <nav class="lab-top">
+    <a class="lab-back" href="./index.html">Lab Index</a>
+    <div class="lab-title">
+      <span class="zh">终端彩蛋</span>
+      <span class="en">Easter Egg · Terminal 404 / Status Panel</span>
+    </div>
+  </nav>
+
+
+  <!-- ===================================================================== -->
+  <!-- VARIANT A — 启动报错 404 (systemd 启动日志风, 自动播放)                -->
+  <!-- 拼接: 整个 #vA section 自包含; JS 在文件底部 initVariantA()           -->
+  <!-- ===================================================================== -->
+  <section class="variant" id="vA">
+    <div class="variant-head">
+      <span class="variant-tag">Variant A</span>
+      <span class="variant-name">Boot Failure</span>
+    </div>
+    <p class="variant-desc">模拟开机自检日志逐行刷出, 最后一行挂在 <b>FAILED 404</b>。冷峻、有 systemd 的工业感, 每行带 <b>[ OK ] / [FAILED]</b> 状态位。灵感: <span class="variant-src">jQuery Terminal 启动序列 · BSD dmesg</span></p>
+    <div class="demo">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="term-bar"><span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span><span class="tt">jinhao@studio — /boot</span></div>
+      <div class="term-body" id="vA-body"></div>
+    </div>
+    <p class="pick">选中此变体 = 复制 #vA section + initVariantA()</p>
+  </section>
+
+
+  <!-- ===================================================================== -->
+  <!-- VARIANT B — 可输入交互 404 (真能打字的终端)                            -->
+  <!-- 支持命令: help / ls / whoami / home / cd / clear                       -->
+  <!-- ===================================================================== -->
+  <section class="variant" id="vB">
+    <div class="variant-head">
+      <span class="variant-tag seal">Variant B</span>
+      <span class="variant-name">Interactive Shell</span>
+    </div>
+    <p class="variant-desc">真的能打字的迷路终端。点一下聚焦, 敲 <b>help</b> 看命令, <b>home</b> 回首页。极客感最强, 把 404 变成一个可玩的壳。灵感: <span class="variant-src">m4tt72/terminal · freeCodeCamp 终端作品集</span></p>
+    <div class="demo">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="term-bar"><span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span><span class="tt">guest@jinhaohu.me — bash</span></div>
+      <div class="term-body" id="vB-body" tabindex="0"></div>
+    </div>
+    <p class="pick">点击终端区域聚焦后可输入</p>
+  </section>
+
+
+  <!-- ===================================================================== -->
+  <!-- VARIANT C — NOW 状态面板 + 黑白艺术区块 (肖然个人站风)                 -->
+  <!-- 自动轮播: 正在读 / 正在写 / 正在攻坚                                   -->
+  <!-- ===================================================================== -->
+  <section class="variant" id="vC">
+    <div class="variant-head">
+      <span class="variant-tag">Variant C</span>
+      <span class="variant-name">Now Panel</span>
+    </div>
+    <p class="variant-desc">左侧 <b>NOW</b> 三行状态自动轮播 (在读 / 在写 / 在攻坚), 右侧象牙白区块配行书大字与竖排印章。最克制最高级, 适合做首页一角的"此刻"。灵感: <span class="variant-src">肖然 xiaoran 个人站 · nownownow.com</span></p>
+    <div class="demo">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="panel">
+        <div class="now-list">
+          <div class="now-head"><span class="dot"></span><span class="label">Now — 此刻</span></div>
+          <div class="now-row">
+            <div class="k">Reading · 在读</div>
+            <div class="v" id="vC-read"></div>
+            <div class="meta" id="vC-read-m"></div>
+          </div>
+          <div class="now-row">
+            <div class="k">Writing · 在写</div>
+            <div class="v" id="vC-write"></div>
+            <div class="meta" id="vC-write-m"></div>
+          </div>
+          <div class="now-row">
+            <div class="k">Building · 在攻坚</div>
+            <div class="v" id="vC-build"></div>
+            <div class="meta" id="vC-build-m"></div>
+          </div>
+        </div>
+        <div class="now-block">
+          <div class="grid"></div>
+          <div class="big" id="vC-big" style="left:30px;top:40px"></div>
+          <div class="stamp">此刻</div>
+          <div class="prog" id="vC-prog"></div>
+        </div>
+      </div>
+    </div>
+    <p class="pick">每 4.5s 整组轮播切换</p>
+  </section>
+
+
+  <!-- ===================================================================== -->
+  <!-- VARIANT D — Live 仪表盘 widgets (时钟 / 坐标 / 提交数 / 在线时长)      -->
+  <!-- ===================================================================== -->
+  <section class="variant" id="vD">
+    <div class="variant-head">
+      <span class="variant-tag">Variant D</span>
+      <span class="variant-name">Live Console</span>
+    </div>
+    <p class="variant-desc">四格活体小组件: <b>实时时钟</b> (走秒)、<b>坐标</b> (Seattle 抖动经纬度)、<b>git 提交数</b> (滚动计数 + sparkline)、<b>在线时长</b>。等宽数字、tabular-nums 对齐, 像一块控制台。灵感: <span class="variant-src">Awwwards 极简仪表盘 · 工程师 now-page</span></p>
+    <div class="demo">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="grid4">
+        <div class="cell">
+          <div class="k">Local Time · PST</div>
+          <div class="big" id="vD-clock">--:--:--</div>
+          <div class="sub" id="vD-date"></div>
+        </div>
+        <div class="cell">
+          <div class="k">Coordinates</div>
+          <div class="big" id="vD-lat" style="font-size:22px;margin-top:18px">47.6062° N</div>
+          <div class="sub" id="vD-lng">122.3321° W · Seattle</div>
+        </div>
+        <div class="cell">
+          <div class="k">Git Commits</div>
+          <div class="big gold-n" id="vD-commits">0</div>
+          <div class="spark" id="vD-spark"></div>
+        </div>
+        <div class="cell">
+          <div class="k">Session Uptime</div>
+          <div class="big seal-n" id="vD-up">00:00</div>
+          <div class="sub">建站第 <span id="vD-days">412</span> 天</div>
+          <div class="barwrap"><b id="vD-bar"></b></div>
+        </div>
+      </div>
+    </div>
+    <p class="pick">所有数字实时跳动</p>
+  </section>
+
+
+  <!-- ===================================================================== -->
+  <!-- VARIANT E — 全屏沉浸 404 (kernel panic / CRT 扫描线风)                 -->
+  <!-- ===================================================================== -->
+  <section class="variant" id="vE">
+    <div class="variant-head">
+      <span class="variant-tag seal">Variant E</span>
+      <span class="variant-name">Kernel Panic</span>
+    </div>
+    <p class="variant-desc">最戏剧化的一版: ASCII 印章 + 行书巨号 <b>四〇四</b> + CRT 扫描线叠层 + 红色辉光, 底部"自动重启"进度条跑满后跳首页。当沉浸式全屏 404 用。灵感: <span class="variant-src">Hakim 动态 404 · 复古 CRT 终端美学</span></p>
+    <div class="demo">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="panic" id="vE-body">
+        <div class="scan"></div>
+        <pre class="ascii">  ┌─┐┬─┐┬─┐┌─┐┬─┐
+  ├┤ ├┬┘├┬┘│ │├┬┘
+  └─┘┴└─┴└─└─┘┴└─</pre>
+        <div class="glow ft">*** PAGE FAULT · signal 404 (NOT FOUND) ***</div>
+        <div class="glow ft">在墨色里走丢了一页。</div>
+        <div class="big404">四〇四</div>
+        <div class="glow ft">faulting address: <span class="iv" id="vE-path">/the/page/you/sought</span></div>
+        <div class="glow ft">trace: home → … → <span style="color:var(--seal)">void</span></div>
+        <div class="reboot">auto-reboot to home <span class="barline"><b id="vE-bar"></b></span> <span id="vE-pct">0%</span></div>
+        <div class="ft" style="margin-top:14px">press <span class="iv">[any key]</span> to return now<span class="cursor bar"></span></div>
+      </div>
+    </div>
+    <p class="pick">进度条满 / 按任意键 → 触发跳转 (demo 里循环演示)</p>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ===================== VARIANT A: 启动报错日志 ===================== */
+  function initVariantA(){
+    const body = document.getElementById('vA-body');
+    const lines = [
+      {t:'<span class="ft">[ 0.000000] jinhao-os 2.6 booting — kernel 6.1.0-ink</span>'},
+      {t:'<span class="ok">[  OK  ]</span> Mounted /dev/ivory on /paper'},
+      {t:'<span class="ok">[  OK  ]</span> Started Calligraphy Rendering Service'},
+      {t:'<span class="ok">[  OK  ]</span> Reached target Seal Engraving (胡)'},
+      {t:'<span class="ok">[  OK  ]</span> Loaded fonts: Cormorant, Ma Shan Zheng, Long Cang'},
+      {t:'<span class="warn">[ WARN ]</span> ScrollTrigger: high motion detected, easing applied'},
+      {t:'<span class="ok">[  OK  ]</span> Started GSAP Animation Daemon'},
+      {t:'<span class="ft">[  ··  ] resolving route</span> <span class="iv">/the-page-you-wanted</span> ...'},
+      {t:'<span class="err">[FAILED]</span> Failed to mount route — <span class="err">ENOENT 404</span>'},
+      {t:'<span class="ft">       this page wandered off into the ink.</span>'},
+      {t:'<span class="ft">jinhao@studio</span>:<span class="prompt-path">~</span>$ <span class="iv">cd</span> <span class="prompt-user">/home</span><span class="cursor"></span>',keep:true},
+    ];
+    if(reduce){
+      body.innerHTML = lines.map(l=>'<div class="ln" style="opacity:1">'+l.t+'</div>').join('');
+      return;
+    }
+    body.innerHTML = lines.map((l,i)=>'<div class="ln" id="vA-l'+i+'">'+l.t+'</div>').join('');
+    const els = lines.map((_,i)=>document.getElementById('vA-l'+i));
+    gsap.set(els,{opacity:0,x:-6});
+    const tl = gsap.timeline({scrollTrigger:{trigger:'#vA',start:'top 72%'}});
+    els.forEach((el,i)=>{
+      const fail = lines[i].t.includes('FAILED');
+      tl.to(el,{opacity:1,x:0,duration:.18,ease:'power2.out'}, i*0.16 + (fail?0.25:0));
+      if(fail) tl.fromTo(el,{x:-4},{x:0,duration:.34,ease:'elastic.out(1,.3)'},'<');
+    });
+  }
+
+  /* ===================== VARIANT B: 可输入交互终端 ===================== */
+  function initVariantB(){
+    const body = document.getElementById('vB-body');
+    const PFX = '<span class="prompt-user">guest</span><span class="ft">@</span><span class="prompt-host">jinhaohu.me</span><span class="ft">:</span><span class="prompt-path">~</span><span class="ft">$</span>';
+    let buffer = '';
+    const fs = ['about.md','projects/','writing/','seal.png','resume.pdf'];
+    function print(html,cls){ const d=document.createElement('div'); d.className='out-line '+(cls||''); d.innerHTML=html; body.insertBefore(d,inputLine); }
+    function run(cmd){
+      print(PFX+' <span class="cmd">'+escapeHtml(cmd)+'</span>');
+      const c = cmd.trim().toLowerCase();
+      if(c===''){ }
+      else if(c==='help') print('commands: <span class="iv">help · ls · whoami · home · cd .. · clear</span>','ft');
+      else if(c==='ls') print(fs.map(f=>'<span class="iv">'+f+'</span>').join('   '));
+      else if(c==='whoami') print('胡晋豪 · jinhao — designer / builder, somewhere between ink and code.','ft');
+      else if(c==='cd ..'||c==='cd'||c==='home'){ print('<span class="ok">→</span> returning to home... <span class="ft">(demo: 主站这里跳 window.location=\'/\')</span>'); }
+      else if(c==='clear'){ body.querySelectorAll('.out-line').forEach(n=>n.remove()); }
+      else print('bash: <span class="err">'+escapeHtml(cmd)+'</span>: command not found — try <span class="iv">help</span>','ft');
+    }
+    function escapeHtml(s){return s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+
+    // boot lines
+    body.innerHTML = '';
+    const boot = ['<span class="err">404</span> — the file you asked for isn\'t here.','type <span class="iv">help</span> to look around, or <span class="iv">home</span> to leave.'];
+    boot.forEach(b=>{const d=document.createElement('div');d.className='out-line ft';d.innerHTML=b;body.appendChild(d);});
+
+    const inputLine = document.createElement('div'); inputLine.className='input-line';
+    inputLine.innerHTML = '<span class="pfx">'+PFX+'</span><span class="typed" id="vB-typed"></span><span class="cursor"></span>';
+    body.appendChild(inputLine);
+    const typed = inputLine.querySelector('#vB-typed');
+
+    body.addEventListener('click',()=>body.focus());
+    body.addEventListener('keydown',(e)=>{
+      if(e.key==='Enter'){ run(buffer); buffer=''; typed.textContent=''; e.preventDefault(); body.scrollTop=body.scrollHeight; }
+      else if(e.key==='Backspace'){ buffer=buffer.slice(0,-1); typed.textContent=buffer; e.preventDefault(); }
+      else if(e.key.length===1 && !e.metaKey && !e.ctrlKey){ buffer+=e.key; typed.textContent=buffer; e.preventDefault(); }
+    });
+    // ghost-type a demo command on first scroll-in (so 静态截图也好看)
+    if(!reduce){
+      ScrollTrigger.create({trigger:'#vB',start:'top 70%',once:true,onEnter:()=>{
+        const demo='help'; let i=0;
+        const iv=setInterval(()=>{ buffer=demo.slice(0,++i); typed.textContent=buffer;
+          if(i>=demo.length){clearInterval(iv); setTimeout(()=>{run(buffer);buffer='';typed.textContent='';},420);} },110);
+      }});
+    }
+  }
+
+  /* ===================== VARIANT C: NOW 轮播面板 ===================== */
+  function initVariantC(){
+    const sets = [
+      {read:['《置身事内》兰小欢',' 中国政府与经济'], write:['一篇关于「乙方设计师」工作流的随笔','design · workflow'], build:['个人网站 v2 — 印章交互层','GSAP · ScrollTrigger'], big:'读'},
+      {read:['"Thinking in Systems" — Meadows','systems · feedback loops'], write:['给 HR 的独立简历站文案','resume · copy'], build:['市场哨兵风控分析管线','python · cron'], big:'写'},
+      {read:['《人类简史》尤瓦尔·赫拉利','history · narrative'], write:['每日「来时路」投资复盘','journal · investing'], build:['Lab 打样系统 — 维度变体生成','design system'], big:'造'},
+    ];
+    const R=document.getElementById('vC-read'),Rm=document.getElementById('vC-read-m'),
+          W=document.getElementById('vC-write'),Wm=document.getElementById('vC-write-m'),
+          B=document.getElementById('vC-build'),Bm=document.getElementById('vC-build-m'),
+          BIG=document.getElementById('vC-big'),PROG=document.getElementById('vC-prog');
+    let idx=0;
+    function apply(s){ R.textContent=s.read[0];Rm.textContent=s.read[1];
+      W.textContent=s.write[0];Wm.textContent=s.write[1];
+      B.textContent=s.build[0];Bm.textContent=s.build[1];BIG.textContent=s.big; }
+    apply(sets[0]);
+    if(reduce){ PROG.style.width='100%'; return; }
+    function cycle(){
+      const next=sets[(++idx)%sets.length];
+      gsap.to([R,W,B,Rm,Wm,Bm],{opacity:0,y:-6,duration:.4,stagger:.05,ease:'power1.in',onComplete:()=>{
+        apply(next);
+        gsap.fromTo([R,W,B,Rm,Wm,Bm],{opacity:0,y:8},{opacity:1,y:0,duration:.55,stagger:.06,ease:'power2.out'});
+      }});
+      gsap.fromTo(BIG,{opacity:0,scale:.92,rotate:-3},{opacity:1,scale:1,rotate:0,duration:.9,ease:'power3.out'});
+    }
+    gsap.to(PROG,{width:'100%',duration:4.5,ease:'none',repeat:-1,onRepeat:cycle});
+  }
+
+  /* ===================== VARIANT D: Live 仪表盘 ===================== */
+  function initVariantD(){
+    const clock=document.getElementById('vD-clock'),dateEl=document.getElementById('vD-date'),
+          lat=document.getElementById('vD-lat'),lng=document.getElementById('vD-lng'),
+          commits=document.getElementById('vD-commits'),spark=document.getElementById('vD-spark'),
+          up=document.getElementById('vD-up'),bar=document.getElementById('vD-bar');
+    // 时钟 (PST = UTC-8, demo 简化)
+    function tick(){
+      const d=new Date();
+      const pst=new Date(d.getTime()+(d.getTimezoneOffset()*60000)-(8*3600000));
+      const p=n=>String(n).padStart(2,'0');
+      clock.textContent=p(pst.getHours())+':'+p(pst.getMinutes())+':'+p(pst.getSeconds());
+      dateEl.textContent=pst.toDateString();
+    }
+    tick(); if(!reduce) setInterval(tick,1000);
+    // 坐标轻微抖动 (像 GPS 漂移)
+    if(!reduce) setInterval(()=>{
+      lat.textContent=(47.6062+(Math.random()-.5)*0.0009).toFixed(4)+'° N';
+      lng.textContent=(122.3321+(Math.random()-.5)*0.0009).toFixed(4)+'° W · Seattle';
+    },1400);
+    // sparkline
+    const bars=[]; for(let i=0;i<14;i++){const b=document.createElement('i');b.style.height=(20+Math.random()*70)+'%';spark.appendChild(b);bars.push(b);}
+    if(!reduce) setInterval(()=>{bars.forEach(b=>b.style.height=(20+Math.random()*70)+'%');},1600);
+    // commits 滚动计数
+    const target=1287;
+    if(reduce){ commits.textContent=target.toLocaleString(); }
+    else ScrollTrigger.create({trigger:'#vD',start:'top 72%',once:true,onEnter:()=>{
+      const o={n:0}; gsap.to(o,{n:target,duration:2.2,ease:'power2.out',onUpdate:()=>commits.textContent=Math.floor(o.n).toLocaleString()});
+    }});
+    // uptime 自起始
+    const t0=Date.now();
+    function upTick(){ const s=Math.floor((Date.now()-t0)/1000); const p=n=>String(n).padStart(2,'0');
+      up.textContent=p(Math.floor(s/60))+':'+p(s%60); bar.style.width=((s%60)/60*100)+'%'; }
+    upTick(); if(!reduce) setInterval(upTick,1000); else bar.style.width='50%';
+  }
+
+  /* ===================== VARIANT E: Kernel Panic 404 ===================== */
+  function initVariantE(){
+    const bar=document.getElementById('vE-bar'),pct=document.getElementById('vE-pct'),
+          path=document.getElementById('vE-path'),bodyEl=document.getElementById('vE-body');
+    const paths=['/the/page/you/sought','/writing/lost-essay','/projects/ghost','/null'];
+    let pi=0;
+    function fillBar(){
+      const o={p:0};
+      gsap.to(o,{p:100,duration:4,ease:'none',
+        onUpdate:()=>{bar.style.width=o.p+'%';pct.textContent=Math.floor(o.p)+'%';},
+        onComplete:()=>{ // demo 循环: 主站这里改 window.location='/'
+          path.textContent=paths[(++pi)%paths.length];
+          bar.style.width='0%';pct.textContent='0%'; setTimeout(fillBar,500);
+        }});
+    }
+    if(reduce){ bar.style.width='100%'; pct.textContent='100%'; return; }
+    ScrollTrigger.create({trigger:'#vE',start:'top 70%',once:true,onEnter:fillBar});
+    // 轻微 CRT 抖动
+    gsap.to(bodyEl,{x:'+=0.6',duration:.07,repeat:-1,yoyo:true,ease:'none'});
+  }
+
+  /* ===================== 初始化全部变体 ===================== */
+  function boot(){ initVariantA(); initVariantB(); initVariantC(); initVariantD(); initVariantE(); }
+  if(document.readyState!=='loading') boot(); else document.addEventListener('DOMContentLoaded',boot);
+})();
+</script>
+</body>
+</html>
